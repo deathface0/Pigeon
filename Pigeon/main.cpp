@@ -1,44 +1,36 @@
 #include <SDL2/SDL.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdlrenderer2.h>
+#include <SDL2/SDL_mixer_ext.h>
+
+#include <iostream>
+
+static const char* MY_COOL_MP3 = "C:\\Users\\Deathface\\Desktop\\aaa.mp3";
 
 int main(int argc, char** argv) {
-    // Inicializar SDL
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        printf("Error: %s\n", SDL_GetError());
-        return -1;
+    int result = 0;
+    int flags = MIX_INIT_MP3;
+
+    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+        printf("Failed to init SDL\n");
+        exit(1);
     }
 
-    // Crear una ventana con SDL
-    SDL_Window* window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-
-    if (!window) {
-        printf("Error: %s\n", SDL_GetError());
-        SDL_Quit();
-        return -1;
+    if (flags != (result = Mix_Init(flags))) {
+        printf("Could not initialize mixer (result: %d).\n", result);
+        printf("Mix_Init: %s\n", Mix_GetError());
+        exit(1);
     }
 
-    // Bucle principal
-    bool quit = false;
-    while (!quit) {
-        // Manejar eventos de SDL
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                quit = true;
-            }
-        }
+    Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
+    Mix_Music* music = Mix_LoadMUS(MY_COOL_MP3);
+    Mix_PlayMusic(music, 1);
 
-        // Aquí puedes agregar lógica para la renderización y gestión de la interfaz de usuario con SDL
-
-        // Intercambiar el búfer de la ventana
-        SDL_GL_SwapWindow(window);
+    while (!SDL_QuitRequested()) {
+        SDL_Delay(250);
     }
 
-    // Liberar recursos
-    SDL_DestroyWindow(window);
+    Mix_FreeMusic(music);
     SDL_Quit();
-
     return 0;
 }
