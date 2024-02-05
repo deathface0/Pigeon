@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-static const char* MY_COOL_MP3 = "C:\\Users\\Deathface\\Desktop\\aaa.mp3";
+static const char* MY_COOL_MP3 = "Media/a.mp3";
 
 int main(int argc, char** argv) {
     int result = 0;
