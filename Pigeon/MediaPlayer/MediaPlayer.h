@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -12,7 +12,6 @@ extern "C" {
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
 }
-
 
 #ifdef _WIN32
 	#pragma comment(lib, "ws2_32.lib")
@@ -25,12 +24,38 @@ extern "C" {
 
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_opengl3.h>
-#include "GL/glew.h"
+#include "GLEW/GL/glew.h"
+
+#include <vector>
 
 class MediaPlayer
 {
+public:
+	MediaPlayer(const std::string& filePath);
+	~MediaPlayer();
+
+public:
+	void Run(bool& isDone);
+
+	inline int& getFPS() { return this->FPS; }
+
+	inline void setfilePath(const std::string& filePath) { this->m_filePath = filePath; }
+
+private:
+	int ProcessMedia();
+	void CreateWindow();
+	void RenderFrame(const AVFrame* frame);
+
+	int LoadMedia();
+	void PlayMedia(const std::vector<AVFrame*>& frameBuffer);
+
 private:
 	std::string m_filePath = "";
+
+	
+	const static size_t MAX_BUFFER_SIZE = 100 * 1024 * 1024;
+	std::vector<AVFrame*> frameBuffer;
+
 
 	const AVCodec* m_codec = nullptr;
 
@@ -49,26 +74,5 @@ private:
 
 	int VIDEO_INDEX = -1;
 	int FPS = 60;
-
-public:
-	int ProcessMedia();
-	void CreateWindow();
-	void RenderWindow();
-
-	void PlayMedia();
-
-	void Run(bool& isDone);
-
-	int& getFPS() {
-		return this->FPS;
-	}
-
-	void setfilePath(const std::string& filePath) {
-		this->m_filePath = filePath;
-	}
-
-public:
-	MediaPlayer(const std::string& filePath);
-	~MediaPlayer();
 };
 

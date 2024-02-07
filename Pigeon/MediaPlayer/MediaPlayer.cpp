@@ -10,8 +10,6 @@ MediaPlayer::MediaPlayer(const std::string& filePath) : m_filePath(filePath), ds
 
 MediaPlayer::~MediaPlayer()
 {
-
-
     if (m_formatContext != nullptr) {
         avformat_free_context(m_formatContext);
         m_formatContext = nullptr;
@@ -47,9 +45,7 @@ MediaPlayer::~MediaPlayer()
         m_window = nullptr;
     }
 
-    std::cout << "a was deleted" << std::endl;
-
-
+    std::cout << "MediaPlayer was deleted" << std::endl;
 }
 
 int MediaPlayer::ProcessMedia()
@@ -84,7 +80,8 @@ int MediaPlayer::ProcessMedia()
     if (avcodec_open2(m_codecContext, m_codec, nullptr) < 0) {
         return -1;
     }
-    return 0;
+
+    return 1;
 }
 
 void MediaPlayer::CreateWindow()
@@ -94,84 +91,96 @@ void MediaPlayer::CreateWindow()
     m_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, m_codecContext->width, m_codecContext->height);
 }
 
-void MediaPlayer::RenderWindow()
+void MediaPlayer::RenderFrame(const AVFrame* frame)
 {
-    
     dstRect.x = 0;
     dstRect.y = 0;
     dstRect.w = m_codecContext->width;
     dstRect.h = m_codecContext->height;
 
-    SDL_UpdateYUVTexture(m_texture, &dstRect, m_currentFrame->data[0], m_currentFrame->linesize[0], m_currentFrame->data[1], m_currentFrame->linesize[1], m_currentFrame->data[2], m_currentFrame->linesize[2]);
+    SDL_UpdateYUVTexture(m_texture, &dstRect, frame->data[0], frame->linesize[0], frame->data[1], frame->linesize[1], frame->data[2], frame->linesize[2]);
 
     SDL_RenderClear(m_renderer);
     SDL_RenderCopy(m_renderer, m_texture, nullptr, &dstRect);
     SDL_RenderPresent(m_renderer);
 
     SDL_GL_SwapWindow(m_window);
-
 }
 
-void MediaPlayer::PlayMedia()
+int MediaPlayer::LoadMedia()
 {
-    int last_ticks = SDL_GetTicks();
     bool quitVideo = false;
 
-   
-
-    SDL_GLContext gl_context2 = SDL_GL_CreateContext(m_window);
-
-
-    while (av_read_frame(m_formatContext, m_currentPacket) >= 0)  {
+    while (av_read_frame(m_formatContext, m_currentPacket) >= 0) {
         if (m_currentPacket->stream_index == VIDEO_INDEX) {
             int ret = avcodec_send_packet(m_codecContext, m_currentPacket);
-            if (ret < 0) {
+            if (ret < 0) 
                 break;
-            }
 
-            while (ret >= 0 && !quitVideo) {
-                
-
-                SDL_Delay(1000 / FPS);
-
-
-                SDL_Event event;
-                while (SDL_PollEvent(&event) > 0) {
-                    switch (event.type) {
-                        case SDL_QUIT:
-                            quitVideo = true;
-                            break;
-
-                        case SDL_WINDOWEVENT:
-                            if (event.window.event == SDL_WINDOWEVENT_CLOSE) 
-                                quitVideo = true;                       
-                            break;
-                    }
+            while (ret >= 0)
+            {
+                if (frameBuffer.size() >= MAX_BUFFER_SIZE) {
+                    std::cout << "MAX_BUFFER_SIZE reached, clearing buffer" << std::endl;
+                    PlayMedia(frameBuffer);
+                    frameBuffer.clear();
                 }
 
                 ret = avcodec_receive_frame(m_codecContext, m_currentFrame);
                 if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
                     break;
-                
 
-                RenderWindow();
+                AVFrame* frame = av_frame_clone(m_currentFrame);
+                frameBuffer.push_back(frame);
             }
         }
         av_packet_unref(m_currentPacket);
     }
+    std::cout << "loaded " << frameBuffer.size() * sizeof(AVFrame*) << std::endl;
+
+    PlayMedia(frameBuffer);
+    frameBuffer.clear();
 
     delete this;
+
+    return 1;
+}
+
+void MediaPlayer::PlayMedia(const std::vector<AVFrame*>& frameBuffer)
+{
+    bool quitVideo = false;
+
+    SDL_GLContext gl_context2 = SDL_GL_CreateContext(m_window);
+
+    for (const AVFrame* frame : frameBuffer) {
+        if (quitVideo)
+            break;
+
+        RenderFrame(frame);
+
+        SDL_Delay(1000 / FPS);
+
+        SDL_Event event;
+        while (SDL_PollEvent(&event) > 0) {
+            switch (event.type) {
+            case SDL_QUIT:
+                return;
+            case SDL_WINDOWEVENT:
+                if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+                    return;
+                break;
+            }
+        }
+    }
 }
 
 void MediaPlayer::Run(bool& isDone)
 {
         std::thread([&] {
-            if (ProcessMedia() == 0) {
+            if (ProcessMedia()) {
                 CreateWindow();
-                PlayMedia();
+                LoadMedia();
+                //PlayMedia();
                 isDone = true;
             }
-            }).detach();
-
-            
+        }).detach(); 
 }
