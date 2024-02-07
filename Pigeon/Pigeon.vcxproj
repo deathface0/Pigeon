@@ -76,71 +76,106 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Pigeon\ext\include\FFmpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\imgui;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\SFML\include;$(SolutionDir)Dependencies\OpenCV\include;$(SolutionDir)Dependencies\FFmpeg\include;$(SolutionDir)Dependencies\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLFW\lib;$(SolutionDir)Dependencies\SFML\lib;$(SolutionDir)Dependencies\GLEW\lib;$(SolutionDir)Dependencies\OpenCV\lib;$(SolutionDir)Dependencies\FFmpeg\lib;$(SolutionDir)Dependencies\SDL2\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);imgui.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;swscale.lib;opengl32.lib;SDL2.lib;SDL2main.lib;glew32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Pigeon\ext\include\FFmpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\imgui;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\SFML\include;$(SolutionDir)Dependencies\OpenCV\include;$(SolutionDir)Dependencies\FFmpeg\include;$(SolutionDir)Dependencies\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLFW\lib;$(SolutionDir)Dependencies\SFML\lib;$(SolutionDir)Dependencies\GLEW\lib;$(SolutionDir)Dependencies\OpenCV\lib;$(SolutionDir)Dependencies\FFmpeg\lib;$(SolutionDir)Dependencies\SDL2\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);imgui.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;swscale.lib;opengl32.lib;SDL2.lib;SDL2main.lib;glew32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Pigeon\ext\include\FFmpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\imgui;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\SFML\include;$(SolutionDir)Dependencies\OpenCV\include;$(SolutionDir)Dependencies\FFmpeg\include;$(SolutionDir)Dependencies\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLFW\lib;$(SolutionDir)Dependencies\SFML\lib;$(SolutionDir)Dependencies\GLEW\lib;$(SolutionDir)Dependencies\OpenCV\lib;$(SolutionDir)Dependencies\FFmpeg\lib;$(SolutionDir)Dependencies\SDL2\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);imgui.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;swscale.lib;opengl32.lib;SDL2.lib;SDL2main.lib;glew32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Pigeon\ext\include\FFmpeg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\imgui;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\glm;$(SolutionDir)Dependencies\SFML\include;$(SolutionDir)Dependencies\OpenCV\include;$(SolutionDir)Dependencies\FFmpeg\include;$(SolutionDir)Dependencies\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)ext\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;imgui.lib;mpg123.lib;out123.lib;SDL2.lib;SDL2main.lib;SDL2_mixer_ext.lib;swresample.lib;swscale.lib;syn123.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\GLFW\lib;$(SolutionDir)Dependencies\SFML\lib;$(SolutionDir)Dependencies\GLEW\lib;$(SolutionDir)Dependencies\OpenCV\lib;$(SolutionDir)Dependencies\FFmpeg\lib;$(SolutionDir)Dependencies\SDL2\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);imgui.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;swscale.lib;opengl32.lib;SDL2.lib;SDL2main.lib;glew32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Dependencies\imgui\imgui\imgui.cpp" />
+    <ClCompile Include="..\Dependencies\imgui\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\Dependencies\imgui\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\Dependencies\imgui\imgui\imgui_impl_opengl2.cpp" />
+    <ClCompile Include="..\Dependencies\imgui\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\Dependencies\imgui\imgui\imgui_impl_sdl2.cpp" />
+    <ClCompile Include="..\Dependencies\imgui\imgui\imgui_impl_sdlrenderer2.cpp" />
+    <ClCompile Include="..\Dependencies\imgui\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\Dependencies\imgui\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\Dependencies\imgui\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MediaPlayer\MediaPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Dependencies\GLEW\include\GL\glew.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imconfig.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imgui.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imgui_impl_metal.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imgui_impl_opengl2.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imgui_impl_osx.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imgui_impl_sdl2.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imgui_impl_sdlrenderer2.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imgui_internal.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\Dependencies\imgui\imgui\imstb_truetype.h" />
     <ClInclude Include="MediaPlayer\MediaPlayer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
