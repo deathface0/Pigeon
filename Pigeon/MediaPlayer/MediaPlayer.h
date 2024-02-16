@@ -1,7 +1,10 @@
 #pragma once
 #include <iostream>
 #include <string>
-#include <SDL.h>
+#include <vector>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer_ext.h>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -12,7 +15,6 @@ extern "C" {
 #include <libavfilter/buffersink.h>
 #include <libavfilter/buffersrc.h>
 }
-
 
 #ifdef _WIN32
 	#pragma comment(lib, "ws2_32.lib")
@@ -25,18 +27,47 @@ extern "C" {
 
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_opengl3.h>
-#include "GL/glew.h"
+#include "GLEW/GL/glew.h"
 
 class MediaPlayer
 {
+public:
+	MediaPlayer(const std::string& filePath);
+	~MediaPlayer();
+
+public:
+	void Run(bool& isDone);
+
+	inline int& getFPS() { return this->FPS; }
+
+	inline void setfilePath(const std::string& filePath) { this->m_filePath = filePath; }
+
+private:
+	int ProcessMedia();
+	void CreateWindow();
+	void RenderVideoFrame(const AVFrame* frame);
+	void PlayAudioFrame(const AVFrame* audioFrame);
+
+	int LoadMedia();
+	void PlayMedia(const std::vector<AVFrame*>& frameBuffer, const std::vector<AVFrame*>& audioFrameBuffer);
+
 private:
 	std::string m_filePath = "";
 
-	const AVCodec* m_codec = nullptr;
+	
+	const static size_t MAX_BUFFER_SIZE = 100 * 1024 * 1024;
+	std::vector<AVFrame*> videoBuffer;
+	std::vector<AVFrame*> audioBuffer;
+
+
+	const AVCodec* m_videoCodec = nullptr;
+	const AVCodec* m_audioCodec = nullptr;
 
 	AVFormatContext* m_formatContext = nullptr;
-	AVCodecParameters* m_codecParams = nullptr;
-	AVCodecContext* m_codecContext = nullptr;
+	AVCodecParameters* m_videoCodecParams = nullptr;
+	AVCodecParameters* m_audioCodecParams = nullptr;
+	AVCodecContext* m_videoCodecContext = nullptr;
+	AVCodecContext* m_audioCodecContext = nullptr;
 
 	AVFrame* m_currentFrame = nullptr;
 	AVPacket* m_currentPacket = nullptr;
@@ -48,27 +79,7 @@ private:
 	SDL_Rect dstRect;
 
 	int VIDEO_INDEX = -1;
+	int AUDIO_INDEX = -1; //TODO: Stereo
 	int FPS = 60;
-
-public:
-	int ProcessMedia();
-	void CreateWindow();
-	void RenderWindow();
-
-	void PlayMedia();
-
-	void Run(bool& isDone);
-
-	int& getFPS() {
-		return this->FPS;
-	}
-
-	void setfilePath(const std::string& filePath) {
-		this->m_filePath = filePath;
-	}
-
-public:
-	MediaPlayer(const std::string& filePath);
-	~MediaPlayer();
 };
 
