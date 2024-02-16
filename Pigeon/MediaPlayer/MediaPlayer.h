@@ -1,7 +1,10 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <vector>
+
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer_ext.h>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -26,8 +29,6 @@ extern "C" {
 #include <imgui/imgui_impl_opengl3.h>
 #include "GLEW/GL/glew.h"
 
-#include <vector>
-
 class MediaPlayer
 {
 public:
@@ -44,24 +45,29 @@ public:
 private:
 	int ProcessMedia();
 	void CreateWindow();
-	void RenderFrame(const AVFrame* frame);
+	void RenderVideoFrame(const AVFrame* frame);
+	void PlayAudioFrame(const AVFrame* audioFrame);
 
 	int LoadMedia();
-	void PlayMedia(const std::vector<AVFrame*>& frameBuffer);
+	void PlayMedia(const std::vector<AVFrame*>& frameBuffer, const std::vector<AVFrame*>& audioFrameBuffer);
 
 private:
 	std::string m_filePath = "";
 
 	
 	const static size_t MAX_BUFFER_SIZE = 100 * 1024 * 1024;
-	std::vector<AVFrame*> frameBuffer;
+	std::vector<AVFrame*> videoBuffer;
+	std::vector<AVFrame*> audioBuffer;
 
 
-	const AVCodec* m_codec = nullptr;
+	const AVCodec* m_videoCodec = nullptr;
+	const AVCodec* m_audioCodec = nullptr;
 
 	AVFormatContext* m_formatContext = nullptr;
-	AVCodecParameters* m_codecParams = nullptr;
-	AVCodecContext* m_codecContext = nullptr;
+	AVCodecParameters* m_videoCodecParams = nullptr;
+	AVCodecParameters* m_audioCodecParams = nullptr;
+	AVCodecContext* m_videoCodecContext = nullptr;
+	AVCodecContext* m_audioCodecContext = nullptr;
 
 	AVFrame* m_currentFrame = nullptr;
 	AVPacket* m_currentPacket = nullptr;
@@ -73,6 +79,7 @@ private:
 	SDL_Rect dstRect;
 
 	int VIDEO_INDEX = -1;
+	int AUDIO_INDEX = -1; //TODO: Stereo
 	int FPS = 60;
 };
 
