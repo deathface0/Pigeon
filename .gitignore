@@ -4,7 +4,8 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 Pigeon/main.cpp
-
+Pigeon/ext/lib/avcodec.lib
+Dependencies
 # User-specific files
 *.rsuser
 *.suo
@@ -14,7 +15,6 @@ Pigeon/main.cpp
 *.exe
 *.txt
 Pigeon/ext/lib/avcodec.lib
-Dependencies
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

@@ -16,6 +16,12 @@
     <Filter Include="Header Files\MediaPlayer">
       <UniqueIdentifier>{8872a125-c563-417c-abde-28f2a58502f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\PigeonClient">
+      <UniqueIdentifier>{12c80d5a-4547-4f63-81f9-d30069eb697a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{c7749020-774d-4ee8-a24a-a527aa408055}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MediaPlayer\MediaPlayer.cpp">
@@ -24,10 +30,34 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PigeonClient\PigeonClient.cpp">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClCompile>
+    <ClCompile Include="PigeonClient\WindowsTcpClient.cpp">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClCompile>
+    <ClCompile Include="PigeonClient\TcpClient.cpp">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MediaPlayer\MediaPlayer.h">
       <Filter>Header Files\MediaPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\PigeonClient.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\WindowsTcpClient.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\TcpClient.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\PigeonPacket.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Utils.h">
+      <Filter>Header Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
