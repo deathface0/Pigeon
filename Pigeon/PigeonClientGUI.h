@@ -79,12 +79,15 @@ namespace PigeonClientGUI
 		}
 	}
 
+	void ChatPage(PigeonClient* client)
+	{
 
+	}
 
 
     int CreateImGuiWindow()
     {
-        SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
+        SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
 
         sdlWindow = SDL_CreateWindow("Pigeon Client", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, window_flags);
 
@@ -241,12 +244,18 @@ namespace PigeonClientGUI
     void MainWindow(PigeonClient* client) {
         ImGui::Begin("Pigeon Client", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
+		//Resize Imgui window
+		SDL_GetWindowSize(sdlWindow, &windowWidth, &windowHeight);
+		ImVec2 newSize = ImVec2(windowWidth * 1.0f, windowHeight * 1.0f);
+		ImGui::SetWindowSize(newSize);
+
+		//Select current page
 		switch (currentPage)
 		{
 		case Page::WELCOME_PAGE:
 			WelcomePage(client);
-		//case Page::CHAT_PAGE:
-
+		case Page::CHAT_PAGE:
+			ChatPage(client);
 		}
 		
     }
