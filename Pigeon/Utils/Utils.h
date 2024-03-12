@@ -148,18 +148,24 @@ namespace GUIUtils
         ImGui::InputText(label, buf, buf_size, flags);
     }
 
-    inline void ImageCentered(const char* imagePath, GLuint& texture, int width, int height, float aspectRatio)
+    inline void ImageCentered(const char* imagePath, GLuint& texture, int& width, int& height, float aspectRatio, bool& loaded, bool load_first_time_only = true)
     {
-        int channels;
-        unsigned char* my_image_data = stbi_load(imagePath, &width, &height, &channels, 4);
-        assert(my_image_data != NULL);
+        //Load image only once if desired (recommended)
+        if (!loaded)
+        {
+            int channels;
+            unsigned char* my_image_data = stbi_load(imagePath, &width, &height, &channels, 4);
+            assert(my_image_data != NULL);
 
-        // Turn the RGBA pixel data into an OpenGL texture:
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
+            // Turn the RGBA pixel data into an OpenGL texture:
+            glGenTextures(1, &texture);
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
 
+            loaded = load_first_time_only ? true : false;
+        }
+        
         auto windowWidth = ImGui::GetWindowSize().x;
         
         ImGui::SetCursorPosX((windowWidth - width * aspectRatio) * 0.5f);

@@ -13,7 +13,11 @@
 #include <vector>
 #include "Utils/Utils.h"
 
-
+enum Page
+{
+	WELCOME_PAGE = 0,
+	CHAT_PAGE
+};
 
 namespace PigeonClientGUI
 {
@@ -39,8 +43,9 @@ namespace PigeonClientGUI
 
 	GLuint my_opengl_texture;
 	int my_image_width, my_image_height;
+	inline bool loaded = false;
 
-
+	int currentPage = Page::WELCOME_PAGE;
 
 
 	void WelcomePage(PigeonClient* client)
@@ -50,7 +55,7 @@ namespace PigeonClientGUI
 		GUIUtils::TextCentered("Welcome to Pigeon");
 
 		//Logo
-		GUIUtils::ImageCentered(imagePath, my_opengl_texture, my_image_width, my_image_height, 0.5);
+		GUIUtils::ImageCentered(imagePath, my_opengl_texture, my_image_width, my_image_height, 0.5, loaded);
 
 		//Form
 		ImGui::NewLine();
@@ -69,6 +74,8 @@ namespace PigeonClientGUI
 		{
 			client = new PigeonClient(Address, atoi(Port), Username);
 			client->Run();
+
+			currentPage = Page::CHAT_PAGE;
 		}
 	}
 
@@ -233,7 +240,15 @@ namespace PigeonClientGUI
 
     void MainWindow(PigeonClient* client) {
         ImGui::Begin("Pigeon Client", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-		WelcomePage(client);
+
+		switch (currentPage)
+		{
+		case Page::WELCOME_PAGE:
+			WelcomePage(client);
+		//case Page::CHAT_PAGE:
+
+		}
+		
     }
 
 	void Cleanup() {
