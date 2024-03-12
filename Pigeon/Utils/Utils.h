@@ -1,12 +1,19 @@
 #pragma once
 
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdl2.h>
+#include <imgui/imgui_impl_opengl3.h>
+#include <GLEW/GL/glew.h>
+
+#include "stb_image/stb_image.h"
+
 #include <iostream>
 #include <fstream>
 #include <iterator>
 #include <sstream>
 #include <vector>
 #include <iomanip>
-
+#include <functional>
 
 namespace File {
     static bool BufferToDisk(const std::vector<unsigned char>& buffer, const std::string& filename) {
@@ -56,6 +63,10 @@ namespace File {
             return filepath.substr(lastSlashIndex + 1);
         }
         return "";
+    }
+
+    static unsigned char* loadImage(const char* filename, int* width, int* height, int* channels) {
+        return stbi_load(filename, width, height, channels, STBI_rgb_alpha);
     }
 }
 
@@ -114,5 +125,52 @@ namespace B64 {
             }
         }
         return out;
+    }
+}
+
+
+namespace GUIUtils
+{
+    inline void TextCentered(const std::string text) {
+        auto windowWidth = ImGui::GetWindowSize().x;
+        auto textWidth = ImGui::CalcTextSize(text.c_str()).x;
+
+        ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+        ImGui::Text(text.c_str());
+    }
+
+    inline void InputCentered(const char* label, char* buf, int buf_size , float width, ImGuiInputTextFlags flags)
+    {
+        auto windowWidth = ImGui::GetWindowSize().x;
+
+        ImGui::SetCursorPosX((windowWidth - width) * 0.5f);
+        ImGui::PushItemWidth(width);
+        ImGui::InputText(label, buf, buf_size, flags);
+    }
+
+    inline void ImageCentered(const char* imagePath, GLuint& texture, int width, int height, float aspectRatio)
+    {
+        int channels;
+        unsigned char* my_image_data = stbi_load(imagePath, &width, &height, &channels, 4);
+        assert(my_image_data != NULL);
+
+        // Turn the RGBA pixel data into an OpenGL texture:
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
+
+        auto windowWidth = ImGui::GetWindowSize().x;
+        
+        ImGui::SetCursorPosX((windowWidth - width * aspectRatio) * 0.5f);
+        ImGui::Image((void*)(intptr_t)texture, ImVec2(width * aspectRatio, height * aspectRatio));
+    }
+
+    inline bool ButtonCentered(const char* label, float width, float height)
+    {
+        auto windowWidth = ImGui::GetWindowSize().x;
+
+        ImGui::SetCursorPosX((windowWidth - width) * 0.5f);
+        return ImGui::Button(label, ImVec2{ width, height });
     }
 }
