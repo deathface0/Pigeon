@@ -13,6 +13,7 @@
 #include <thread>
 #include <unordered_map>
 
+#include "PigeonClientGUIInfo.h"
 #include "PigeonPacket.h"
 #include "../Utils/Utils.h"
 
@@ -32,14 +33,18 @@ public:
 	void Run();
 	void SendPacket(const PigeonPacket& pkt);
 	
+	void SendMsg(const std::string& message);
 	void SendFile(const std::string& filepath);
 	void DownloadFile(const std::string& filename);
+
+	bool isConnected() { return m_connected; }
 
 private:
 	std::string m_host = "";
 	unsigned short m_port = -1;
 	std::string m_username = "";
 	std::string m_servername = "";
+	bool m_connected = false;
 
 	std::vector<std::string> filePaths;
 

@@ -175,16 +175,15 @@ void* PigeonClient::ProcessPacket()
     }
 
     m_servername = servername;
+    m_connected = true;
 
     std::cout << "CONNECTED TO " << m_servername << std::endl;
 
     while (true) {
-
         std::vector<unsigned char> recv = ReadPacket();
 
         if (recv.empty()) {
             //Disconnect & handle GUI
-            std::cout << "SERVER DISCONNECTED " << std::endl;
             return nullptr;
         }
 
@@ -206,6 +205,7 @@ void* PigeonClient::ProcessPacket()
                 
                 //Update GUI with updated clients
                 std::cout << key << " status: " << value << std::endl;
+                PigeonClientGUIInfo::Users.insert(std::make_pair(key, value));
             }
 
 
@@ -277,6 +277,13 @@ void PigeonClient::SendPacket(const PigeonPacket& pkt)
 {
     auto bytes = SerializePacket(pkt);
     this->m_client->SendAll(bytes);
+}
+
+void PigeonClient::SendMsg(const std::string& message)
+{
+    PigeonPacket pkg = BuildPacket(PIGEON_OPCODE::TEXT_MESSAGE, m_username, String::StringToBytes(message));
+
+    SendPacket(pkg);
 }
 
 void PigeonClient::SendFile(const std::string& filepath)

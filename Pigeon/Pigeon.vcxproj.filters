@@ -66,6 +66,9 @@
     <ClCompile Include="stb_image.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_stdlib.cpp">
+      <Filter>Header Files\imgui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MediaPlayer\MediaPlayer.h">
@@ -104,9 +107,6 @@
     <ClInclude Include="..\Dependencies\include\imgui\imgui_impl_opengl3.h">
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="PigeonClientGUI.h">
-      <Filter>Header Files\PigeonClient</Filter>
-    </ClInclude>
     <ClInclude Include="ImGuiLogger.h">
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
@@ -115,6 +115,15 @@
     </ClInclude>
     <ClInclude Include="..\Dependencies\include\stb_image\stb_image.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\include\imgui\imgui_stdlib.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\PigeonClientGUI.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\PigeonClientGUIInfo.h">
+      <Filter>Header Files\PigeonClient</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -21,7 +21,7 @@ int WindowsTcpClient::SocketCreate()
 	hints.ai_family = AF_INET;
 
 	if (ResolveDomainName() == -1) {
-		std::cout << "getaddrinfo falied" << std::endl;
+		std::cout << "getaddrinfo failed" << std::endl;
 		return -1;
 	}
 
@@ -70,14 +70,14 @@ int WindowsTcpClient::Connect()
 		std::cout << "Failed to create socket " << WSAGetLastError() << std::endl;
 		closesocket(cSocket);
 		WSACleanup();
-		return 1;
+		return -1;
 	}
 
 	if (connect(cSocket, (SOCKADDR*)&sAddr, sizeof(sAddr)) == SOCKET_ERROR) {
 		std::cout << "Failed to establish TCP handshake." << WSAGetLastError() << std::endl;
 		closesocket(cSocket);
 		WSACleanup();
-		return 1;
+		return -1;
 	}
 
 	SSL_set_fd(ssl, cSocket);
@@ -88,8 +88,26 @@ int WindowsTcpClient::Connect()
 		SSL_shutdown(ssl);
 		SSL_free(ssl);
 		WSACleanup();
+		return -1;
+	}
+
+	return 0;
+}
+
+int WindowsTcpClient::Disconnect()
+{
+	// Close SSL socket 
+	SSL_shutdown(ssl);
+	SSL_free(ssl);
+
+	// Close TCP socket 
+	if (closesocket(cSocket) == SOCKET_ERROR) {
+		std::cout << "Failed to close socket: " << WSAGetLastError() << std::endl;
 		return 1;
 	}
+
+	// Cleanup Winsock
+	WSACleanup();
 
 	return 0;
 }

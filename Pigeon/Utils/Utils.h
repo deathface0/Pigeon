@@ -3,6 +3,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui_stdlib.h>
 #include <GLEW/GL/glew.h>
 
 #include "stb_image/stb_image.h"
@@ -139,13 +140,13 @@ namespace GUIUtils
         ImGui::Text(text.c_str());
     }
 
-    inline void InputCentered(const char* label, char* buf, int buf_size , float width, ImGuiInputTextFlags flags)
+    inline void InputCentered(const char* label, std::string& buf , float width, ImGuiInputTextFlags flags)
     {
         auto windowWidth = ImGui::GetWindowSize().x;
 
         ImGui::SetCursorPosX((windowWidth - width) * 0.5f);
         ImGui::PushItemWidth(width);
-        ImGui::InputText(label, buf, buf_size, flags);
+        ImGui::InputText(label, &buf, flags);
     }
 
     inline void ImageCentered(const char* imagePath, GLuint& texture, int& width, int& height, float aspectRatio, bool& loaded, bool load_first_time_only = true)
@@ -170,6 +171,40 @@ namespace GUIUtils
         
         ImGui::SetCursorPosX((windowWidth - width * aspectRatio) * 0.5f);
         ImGui::Image((void*)(intptr_t)texture, ImVec2(width * aspectRatio, height * aspectRatio));
+    }
+
+    inline bool RoundButton(const char* imagePath, GLuint& texture, int size, bool& loaded, bool load_first_time_only = true) {
+        //Load image only once if desired (recommended)
+        if (!loaded)
+        {
+            int channels;
+            unsigned char* my_image_data = stbi_load(imagePath, &size, &size, &channels, 4);
+            assert(my_image_data != NULL);
+
+            // Turn the RGBA pixel data into an OpenGL texture:
+            glGenTextures(1, &texture);
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
+
+            loaded = load_first_time_only ? true : false;
+        }
+
+        // Obtener el tamaño deseado para el botón circular
+        const float buttonSize = size;
+
+        // Calcular el centro del botón circular
+        ImVec2 center = ImGui::GetCursorScreenPos();
+        center.x += buttonSize / 2.0f;
+        center.y += buttonSize / 2.0f;
+
+        // Dibujar un círculo invisible para actuar como área de clic
+        bool val = ImGui::InvisibleButton("ImageButton", ImVec2(buttonSize, buttonSize));
+
+        // Dibujar la imagen
+        ImGui::GetWindowDrawList()->AddImage((void*)(intptr_t)texture, ImVec2(center.x - buttonSize / 2, center.y - buttonSize / 2), ImVec2(center.x + buttonSize / 2, center.y + buttonSize / 2));
+
+        return val;
     }
 
     inline bool ButtonCentered(const char* label, float width, float height)

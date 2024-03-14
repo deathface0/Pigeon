@@ -85,6 +85,18 @@ int TcpClient::Connect() {
     return 0;
 }
 
+int TcpClient::Disconnect()
+{
+    // Cerrar la conexión SSL
+    SSL_shutdown(ssl);
+    SSL_free(ssl);
+
+    // Cerrar el socket TCP
+    close(cSocket);
+
+    return 0;
+}
+
 
 const int TcpClient::GetTlsVersion() {
     return SSL_version(this->ssl);

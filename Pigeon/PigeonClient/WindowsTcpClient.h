@@ -55,6 +55,7 @@ public:
     const std::string GetCipher();
 
     int Connect();
+    int Disconnect();
 
     int SendAll(std::vector<unsigned char>& buf);
     int SendAll(const std::string& toSend);

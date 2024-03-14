@@ -1,88 +1,116 @@
 #pragma once
 
-#include "PigeonClient/PigeonClient.h"
+#include "PigeonClient.h"
 #include "ImGuiLogger.h"
-#include <iostream>
+#include "Utils/Utils.h"
+
 #include <SDL2/SDL.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui_stdlib.h>
 #include <GLEW/GL/glew.h>
+#include <iostream>
 #include <chrono>
 #include <ctime>
 #include <vector>
-#include "Utils/Utils.h"
+#include <map>
 
-enum Page
-{
-	WELCOME_PAGE = 0,
-	CHAT_PAGE
-};
+using namespace PigeonClientGUIInfo;
 
 namespace PigeonClientGUI
 {
+	PigeonClient* client = nullptr;
+
     SDL_Window* sdlWindow = nullptr;
     SDL_GLContext glContext = NULL;
     SDL_Event currentEvent;
-    bool shouldClose = false;
-    bool shouldDelete = false;
-
-    inline bool shouldLog = false;
 
     ImGuiLog* log = nullptr;
 
-    int windowWidth = 1280;
-    int windowHeight = 760;
-
-	ImFont* largeFont, *smallFont;
-
-	char Username[30], Address[30], Port[10];
-	bool fetchingData = false;
-
-	inline const char* imagePath = "Images\\logo2.png";
-
-	GLuint my_opengl_texture;
-	int my_image_width, my_image_height;
-	inline bool loaded = false;
-
-	int currentPage = Page::WELCOME_PAGE;
-
-
-	void WelcomePage(PigeonClient* client)
+	namespace Welcome
 	{
-		//Title
-		ImGui::PushFont(largeFont);
-		GUIUtils::TextCentered("Welcome to Pigeon");
-
-		//Logo
-		GUIUtils::ImageCentered(imagePath, my_opengl_texture, my_image_width, my_image_height, 0.5, loaded);
-
-		//Form
-		ImGui::NewLine();
-		ImGui::PushFont(smallFont);
-		GUIUtils::TextCentered("Server Address");
-		GUIUtils::InputCentered("##addressField", Address, 30, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
-
-		GUIUtils::TextCentered("Port");
-		GUIUtils::InputCentered("##portField", Port, 10, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
-
-		GUIUtils::TextCentered("Username");
-		GUIUtils::InputCentered("##usernameField", Username, 30, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);	
-
-		ImGui::NewLine();
-		if (GUIUtils::ButtonCentered("Connect", 200, 50))
+		void WelcomePage()
 		{
-			client = new PigeonClient(Address, atoi(Port), Username);
-			client->Run();
+			//Title
+			ImGui::PushFont(largeFont);
+			GUIUtils::TextCentered("Welcome to Pigeon");
 
-			currentPage = Page::CHAT_PAGE;
+			//Logo
+			GUIUtils::ImageCentered("Images\\logo2.png", welcome_texture, my_image_width, my_image_height, 0.5, welcome_loaded);
+
+			//Form
+			ImGui::NewLine();
+			ImGui::PushFont(smallFont);
+			GUIUtils::TextCentered("Server Address");
+			GUIUtils::InputCentered("##addressField", Address, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
+
+			GUIUtils::TextCentered("Port");
+			GUIUtils::InputCentered("##portField", Port, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
+
+			GUIUtils::TextCentered("Username");
+			GUIUtils::InputCentered("##usernameField", Username, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
+
+			ImGui::NewLine();
+			if (GUIUtils::ButtonCentered("Connect", 200, 50))
+			{
+				/*if (Address.empty() || Port.empty() || Username.empty())
+					return;*/
+
+				Address = "192.168.1.135";
+				Port = "4444";
+				Username = "Ahuesag";
+
+				client = new PigeonClient(Address, stoi(Port), Username);
+				client->Run();
+			}
 		}
 	}
 
-	void ChatPage(PigeonClient* client)
+	namespace Chat
 	{
+		void RenderTabBar() {
+			ImGui::PushFont(mediumFont);
+			//ImGui::ShowDemoWindow();
 
+			ImGui::BeginChild("Connected clients", ImVec2(220, windowHeight), true);
+			
+			for (const auto& pair : Users) {
+				if (GUIUtils::RoundButton("Images\\logo2.png", user_icon_texture, 40, user_icon_loaded))
+				{
+					std::cout << "User: " << pair.first << std::endl;
+				}
+				ImGui::SameLine();
+				ImGui::Text("%s", pair.first);
+			}
+
+			/*
+			for (int i = 0; i < 50; i++)
+			{
+				std::string text = "User" + std::to_string(i);
+				GUIUtils::RoundButton("Images\\logo2.png", user_icon_texture, 40, user_icon_loaded);
+				ImGui::SameLine();
+				ImGui::Text("%s", text);
+			}*/
+
+			ImGui::EndChild();
+		}
+
+		void ChatPage()
+		{
+			RenderTabBar();
+			return;
+
+			GUIUtils::InputCentered("##sendMsg", msg, 300, ImGuiInputTextFlags_CharsNoBlank);
+			if (GUIUtils::ButtonCentered("Send", 100, 50))
+			{
+				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::TEXT_MESSAGE, Username, String::StringToBytes(msg));
+				client->SendPacket(pkg);
+			}
+		}
 	}
+
+	
 
 
     int CreateImGuiWindow()
@@ -197,6 +225,7 @@ namespace PigeonClientGUI
 		ImGui::GetStyle().FrameRounding = 100.f;
 
 		largeFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 50);
+		mediumFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 30);
 		smallFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 20);
 	}
 
@@ -241,7 +270,7 @@ namespace PigeonClientGUI
         SDL_GL_SwapWindow(sdlWindow);
     }
 
-    void MainWindow(PigeonClient* client) {
+    void MainWindow() {
         ImGui::Begin("Pigeon Client", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
 		//Resize Imgui window
@@ -249,13 +278,33 @@ namespace PigeonClientGUI
 		ImVec2 newSize = ImVec2(windowWidth * 1.0f, windowHeight * 1.0f);
 		ImGui::SetWindowSize(newSize);
 
+		//Detect page change and set styles/size
+		currentPage = client && client->isConnected() ? Page::CHAT_PAGE : Page::WELCOME_PAGE;
+		if (currentPage != lastPage)
+		{
+			if (currentPage == Page::CHAT_PAGE)
+			{
+				SDL_SetWindowSize(sdlWindow, 1280, 720);
+				ImGui::GetStyle().WindowPadding = ImVec2(0.00f, 0.00f);
+				ImGui::GetStyle().FrameRounding = 0.f;
+			}
+			else if (currentPage == Page::WELCOME_PAGE)
+			{
+				SDL_SetWindowSize(sdlWindow, 500, 760);
+				ImGui::GetStyle().WindowPadding = ImVec2(8.00f, 8.00f);
+			}
+		}
+		lastPage = currentPage;
+
 		//Select current page
 		switch (currentPage)
 		{
 		case Page::WELCOME_PAGE:
-			WelcomePage(client);
+			Welcome::WelcomePage();
+			break;
 		case Page::CHAT_PAGE:
-			ChatPage(client);
+			Chat::ChatPage();
+			break;
 		}
 		
     }
