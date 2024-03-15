@@ -69,14 +69,31 @@ namespace PigeonClientGUI
 
 	namespace Chat
 	{
+		std::string getStatusImage(int status)
+		{
+			switch (status)
+			{
+			case 0:
+				return "Images\\online_status.png";
+			case 1:
+				return "Images\\idle_status.png";
+			case 2:
+				return "Images\\dnd_status.png";
+			default:
+				return "Images\\error_status.png";
+			}
+		}
+
 		void RenderTabBar() {
 			ImGui::PushFont(mediumFont);
 			//ImGui::ShowDemoWindow();
 
 			ImGui::BeginChild("Connected clients", ImVec2(220, windowHeight), true);
 			
+			std::string statusIcon = "";
 			for (const auto& pair : Users) {
-				if (GUIUtils::RoundButton("Images\\logo2.png", user_icon_texture, 40, user_icon_loaded))
+				statusIcon = getStatusImage(stoi(pair.second));
+				if (GUIUtils::RoundButton(statusIcon.c_str(), user_icon_texture, 30, user_icon_loaded))
 				{
 					std::cout << "User: " << pair.first << std::endl;
 				}
