@@ -57,9 +57,9 @@ namespace PigeonClientGUI
 				/*if (Address.empty() || Port.empty() || Username.empty())
 					return;*/
 
-				Address = "192.168.1.135";
+				Address = "192.168.100.16";
 				Port = "4444";
-				Username = "Ahuesag";
+				/*Username = "Ahuesag";*/
 
 				client = new PigeonClient(Address, stoi(Port), Username);
 				client->Run();

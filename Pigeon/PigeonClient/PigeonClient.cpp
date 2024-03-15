@@ -192,12 +192,15 @@ void* PigeonClient::ProcessPacket()
         switch (pkt.HEADER.OPCODE)
         {
         case PRESENCE_UPDATE:
+
             if (!reader.parse(std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end()), value)) {
                 //bad json, again, this wont really happen
                 break;
             }
 
             std::cout << "CONNECTED USERS: \n";
+
+            PigeonClientGUIInfo::Users.clear();
 
             for (Json::ValueIterator it = value.begin(); it != value.end(); ++it) {
                 std::string key = it.key().asString();
