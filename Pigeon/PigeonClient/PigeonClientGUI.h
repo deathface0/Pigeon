@@ -54,15 +54,16 @@ namespace PigeonClientGUI
 			ImGui::NewLine();
 			if (GUIUtils::ButtonCentered("Connect", 200, 50))
 			{
-				/*if (Address.empty() || Port.empty() || Username.empty())
-					return;*/
+				if (Address.empty() || Port.empty() || Username.empty())
+					return;
 
-				Address = "192.168.1.135";
+				/*Address = "192.168.1.135";
 				Port = "4444";
-				Username = "Ahuesag";
+				Username = "Ahuesag";*/
 
 				client = new PigeonClient(Address, stoi(Port), Username);
 				client->Run();
+				//Sleep(2000);
 			}
 		}
 	}
@@ -84,38 +85,65 @@ namespace PigeonClientGUI
 			}
 		}
 
-		void RenderTabBar() {
+		void LeftMenu() {
 			ImGui::PushFont(mediumFont);
-			//ImGui::ShowDemoWindow();
 
-			ImGui::BeginChild("Connected clients", ImVec2(220, windowHeight), true);
+			ImGui::BeginChild("Left Menu", ImVec2(220, windowHeight), true);
+
+			ImGui::BeginChild("Connected clients", ImVec2(220, windowHeight - 50), true);
 			
 			std::string statusIcon = "";
+			
+			GLuint temp_texture;
 			for (const auto& pair : Users) {
 				statusIcon = getStatusImage(stoi(pair.second));
-				if (GUIUtils::RoundButton(statusIcon.c_str(), user_icon_texture, 30, user_icon_loaded))
+				if (GUIUtils::RoundButton(pair.first, statusIcon, temp_texture, 30, user_icon_loaded, false)) //Fix, utils no reload images
 				{
-					std::cout << "User: " << pair.first << std::endl;
+					std::cout << "User: " << pair.first << ", Status: " << pair.second << std::endl;
 				}
+
 				ImGui::SameLine();
 				ImGui::Text("%s", pair.first);
 			}
 
-			/*
-			for (int i = 0; i < 50; i++)
-			{
-				std::string text = "User" + std::to_string(i);
-				GUIUtils::RoundButton("Images\\logo2.png", user_icon_texture, 40, user_icon_loaded);
-				ImGui::SameLine();
-				ImGui::Text("%s", text);
-			}*/
+			ImGui::EndChild(); //End of Connected clients Child
 
-			ImGui::EndChild();
+			ImGui::BeginChild("User Status", ImVec2(220, 50), true);
+
+			int status = stoi(Users[Username]); //Users[Username] always exists (own username)
+			statusIcon = getStatusImage(status);
+			GUIUtils::RoundButton("your_status", statusIcon, your_icon_texture, 30, your_icon_loaded); //Status menu on click
+			ImGui::SameLine();
+			ImGui::Text("%s", Username);
+
+			ImGui::EndChild(); //End of User Status Child
+
+			ImGui::EndChild(); //End of Left Menu Child
+		}
+
+		void RightMenu()
+		{
+			ImGui::BeginChild("Chat", ImVec2(windowWidth - 220, windowHeight), true);
+
+			ImGui::BeginChild("Chat Log", ImVec2(windowWidth - 220, windowHeight - 50), true);
+
+			ImGui::EndChild(); //End of Chat Log Child
+
+			ImGui::BeginChild("MSG", ImVec2(windowWidth - 220, 50), true);
+
+			ImGui::PushFont(largeFont);
+			ImGui::InputText("##MSG", &msg);
+
+			ImGui::EndChild(); //End of MSG Child
+
+			ImGui::EndChild(); //End of Chat Child
 		}
 
 		void ChatPage()
 		{
-			RenderTabBar();
+			LeftMenu();
+			ImGui::SameLine();
+			RightMenu();
 			return;
 
 			GUIUtils::InputCentered("##sendMsg", msg, 300, ImGuiInputTextFlags_CharsNoBlank);
@@ -244,6 +272,8 @@ namespace PigeonClientGUI
 		largeFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 50);
 		mediumFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 30);
 		smallFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 20);
+		msgFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 35);
+
 	}
 
     void SetUpImGui() {
@@ -304,11 +334,13 @@ namespace PigeonClientGUI
 				SDL_SetWindowSize(sdlWindow, 1280, 720);
 				ImGui::GetStyle().WindowPadding = ImVec2(0.00f, 0.00f);
 				ImGui::GetStyle().FrameRounding = 0.f;
+				ImGui::GetStyle().ItemSpacing = ImVec2(0.00f, 0.00f);
 			}
 			else if (currentPage == Page::WELCOME_PAGE)
 			{
 				SDL_SetWindowSize(sdlWindow, 500, 760);
 				ImGui::GetStyle().WindowPadding = ImVec2(8.00f, 8.00f);
+				ImGui::GetStyle().ItemSpacing = ImVec2(6.00f, 6.00f);
 			}
 		}
 		lastPage = currentPage;

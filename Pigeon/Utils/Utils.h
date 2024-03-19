@@ -14,7 +14,8 @@
 #include <sstream>
 #include <vector>
 #include <iomanip>
-#include <functional>
+#include <random>
+#include <sstream>
 
 namespace File {
     static bool BufferToDisk(const std::vector<unsigned char>& buffer, const std::string& filename) {
@@ -86,6 +87,17 @@ namespace String {
     }
 
   
+}
+
+namespace Random {
+    static size_t genRandom(size_t min, size_t max) {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+
+        std::uniform_int_distribution<> distr(min, max);
+
+        return distr(gen);
+    }
 }
 
 /* Not my implementation */
@@ -173,19 +185,20 @@ namespace GUIUtils
         ImGui::Image((void*)(intptr_t)texture, ImVec2(width * aspectRatio, height * aspectRatio));
     }
 
-    inline bool RoundButton(const char* imagePath, GLuint& texture, int size, bool& loaded, bool load_first_time_only = true) {
+    inline bool RoundButton(std::string label, std::string imagePath, GLuint& texture, int size, bool& loaded, bool load_first_time_only = true) {
         //Load image only once if desired (recommended)
         if (!loaded)
         {
+            int temp_size;
             int channels;
-            unsigned char* my_image_data = stbi_load(imagePath, &size, &size, &channels, 4);
+            unsigned char* my_image_data = stbi_load(imagePath.c_str(), &temp_size, &temp_size, &channels, 4);
             assert(my_image_data != NULL);
 
             // Turn the RGBA pixel data into an OpenGL texture:
             glGenTextures(1, &texture);
             glBindTexture(GL_TEXTURE_2D, texture);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, temp_size, temp_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
 
             loaded = load_first_time_only ? true : false;
         }
@@ -199,7 +212,7 @@ namespace GUIUtils
         center.y += buttonSize / 2.0f;
 
         // Dibujar un círculo invisible para actuar como área de clic
-        bool val = ImGui::InvisibleButton("ImageButton", ImVec2(buttonSize, buttonSize));
+        bool val = ImGui::InvisibleButton(label.c_str(), ImVec2(buttonSize, buttonSize));
 
         // Dibujar la imagen
         ImGui::GetWindowDrawList()->AddImage((void*)(intptr_t)texture, ImVec2(center.x - buttonSize / 2, center.y - buttonSize / 2), ImVec2(center.x + buttonSize / 2, center.y + buttonSize / 2));

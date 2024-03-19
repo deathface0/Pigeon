@@ -175,7 +175,6 @@ void* PigeonClient::ProcessPacket()
     }
 
     m_servername = servername;
-    m_connected = true;
 
     std::cout << "CONNECTED TO " << m_servername << std::endl;
 
@@ -199,12 +198,12 @@ void* PigeonClient::ProcessPacket()
 
             std::cout << "CONNECTED USERS: \n";
 
+            PigeonClientGUIInfo::Users.clear(); //Clear users map
             for (Json::ValueIterator it = value.begin(); it != value.end(); ++it) {
                 std::string key = it.key().asString();
                 std::string value = (*it).asString();
                 
                 //Update GUI with updated clients
-                std::cout << key << " status: " << value << std::endl;
                 PigeonClientGUIInfo::Users.insert(std::make_pair(key, value));
             }
 
@@ -261,6 +260,8 @@ void* PigeonClient::ProcessPacket()
             break;
         }
         value.clear();
+
+        m_connected = true; //Connected after receiving first pkg
     }
 
     return nullptr;

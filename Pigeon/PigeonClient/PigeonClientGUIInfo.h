@@ -1,5 +1,6 @@
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_opengl3.h>
@@ -22,7 +23,7 @@ namespace PigeonClientGUIInfo
 	inline int windowWidth = 500;
 	inline int windowHeight = 760;
 
-	inline ImFont* smallFont, *mediumFont, *largeFont;
+	inline ImFont *smallFont, *mediumFont, *largeFont, *msgFont;
 
 	inline std::string Username, Address, Port;
 	inline bool fetchingData = false;
@@ -34,8 +35,12 @@ namespace PigeonClientGUIInfo
 	inline GLuint user_icon_texture;
 	inline bool user_icon_loaded = false;
 
+	inline GLuint your_icon_texture;
+	inline bool your_icon_loaded = false;
+
 	inline int currentPage = Page::WELCOME_PAGE, lastPage = Page::WELCOME_PAGE;
 	inline std::string msg = "";
 
 	inline std::map<std::string, std::string> Users;
+	inline std::map<std::string, bool> images;
 }
