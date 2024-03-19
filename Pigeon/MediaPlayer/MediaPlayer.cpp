@@ -104,7 +104,7 @@ int MediaPlayer::ProcessMedia()
 void MediaPlayer::CreateWindow()
 {
     m_window = SDL_CreateWindow(m_filePath.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, m_videoCodecContext->width, m_videoCodecContext->height, SDL_WINDOW_SHOWN);
-    m_renderer = SDL_CreateRenderer(m_window, 1, 0);
+    m_renderer = SDL_CreateRenderer(m_window, 1, SDL_RENDERER_PRESENTVSYNC);
     m_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, m_videoCodecContext->width, m_videoCodecContext->height);
 }
 

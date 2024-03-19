@@ -191,6 +191,7 @@ void* PigeonClient::ProcessPacket()
         switch (pkt.HEADER.OPCODE)
         {
         case PRESENCE_UPDATE:
+
             if (!reader.parse(std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end()), value)) {
                 //bad json, again, this wont really happen
                 break;
