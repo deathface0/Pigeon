@@ -146,15 +146,26 @@ namespace PigeonClientGUI
 
 			// Menú desplegable
 			if (showMenu) {
-				ImGui::Begin("Status window", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+				ImGui::SetNextWindowPos(ImVec2(0, windowHeight - 180));
+				ImGui::Begin("Status window", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+
+				if (!ImGui::IsWindowFocused() && !selecting) //Maintain window on top
+					ImGui::SetWindowFocus(); 
+
+				selecting = false;
+				ImGui::SetNextItemWidth(220);
 				if (ImGui::BeginCombo("", status_vec[currentStatus])) {
+					selecting = true;
+
 					for (int i = 0; i < IM_ARRAYSIZE(status_vec); i++) {
 						bool isSelected = (currentStatus == i);
 						if (ImGui::Selectable(status_vec[i], isSelected))
+						{
 							client->ChangeStatus(status_vec[i]);
+							showMenu = false;
+						}
 						if (isSelected)
 							ImGui::SetItemDefaultFocus();   // Establecer el enfoque en la opción seleccionada
-						
 					}
 					ImGui::EndCombo();
 				}
@@ -284,6 +295,7 @@ namespace PigeonClientGUI
 		colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 0.00f, 0.00f, 0.70f);
 		colors[ImGuiCol_NavWindowingDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.20f);
 		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.00f, 0.00f, 0.00f, 0.35f);
+
 
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.WindowPadding = ImVec2(8.00f, 8.00f);

@@ -36,6 +36,7 @@ namespace PigeonClientGUIInfo
 	inline const char* status_vec[] = { "ONLINE", "IDLE", "DND" };
 	inline int currentStatus = 0;
 	inline int showMenu = false;
+	inline bool selecting = true;
 
 	inline ImGuiTextBuffer msgBuffer;
 	inline std::string msg = "";
