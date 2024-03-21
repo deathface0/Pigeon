@@ -198,9 +198,6 @@ void* PigeonClient::ProcessPacket()
                 break;
             }
 
-            //std::cout << "CONNECTED USERS: \n";
-            std::cout << std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end()) << std::endl;
-
             PigeonClientGUIInfo::Users.clear(); //Clear users map
             for (Json::ValueIterator it = value.begin(); it != value.end(); ++it) {
                 std::string key = it.key().asString();
@@ -208,8 +205,6 @@ void* PigeonClient::ProcessPacket()
                 
                 //Update GUI with updated clients
                 PigeonClientGUIInfo::Users.insert(std::make_pair(key, value));
-
-                std::cout << key << " - " << value << std::endl;
             }
 
 

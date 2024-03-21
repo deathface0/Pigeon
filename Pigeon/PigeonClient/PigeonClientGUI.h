@@ -75,6 +75,12 @@ namespace PigeonClientGUI
 				/*if (Address.empty() || Port.empty() || Username.empty())
 					return;*/
 
+				if (Username.size() > MAX_USERNAME)
+				{
+					//ERROR: USERNAME TOO LONG
+					return;
+				}
+
 				Address = "192.168.1.135";
 				Port = "4444";
 				/*Username = "Ahuesag";*/
@@ -109,15 +115,19 @@ namespace PigeonClientGUI
 
 			ImGui::BeginChild("Connected clients", ImVec2(220, windowHeight - 50), true);
 			
+			int clientIndex = 0; ImVec2 clientStatusPos = { 10, 10 };
 			for (const auto& pair : Users) {
+				ImGui::SetCursorPos(clientStatusPos);
 				if (GUIUtils::RoundButton(pair.first, getStatusImage(stoi(pair.second)), 30)) //Fix, utils no reload images
 				{
 					std::cout << "User: " << pair.first << ", Status: " << pair.second << std::endl;
 				}
-				
 
 				ImGui::SameLine();
+				ImGui::SetCursorPosX(clientStatusPos.x + 35);
 				ImGui::Text("%s", pair.first);
+
+				clientStatusPos.y += 40;
 			}
 
 			ImGui::EndChild(); //End of Connected clients Child
@@ -125,10 +135,14 @@ namespace PigeonClientGUI
 			ImGui::BeginChild("User Status", ImVec2(220, 50), true);
 
 			currentStatus = stoi(Users[Username]); //Users[Username] always exists (own username)
+			ImGui::SetCursorPos(ImVec2(10, 10));
 			if (GUIUtils::RoundButton("##your_status", getStatusImage(currentStatus), 30))
 			{
 				showMenu = true;
 			}
+			ImGui::SameLine();
+			ImGui::SetCursorPos(ImVec2(45, 10));
+			ImGui::Text("%s", Username);
 
 			// Menú desplegable
 			if (showMenu) {
@@ -146,9 +160,6 @@ namespace PigeonClientGUI
 				}
 				ImGui::End();
 			}
-
-			ImGui::SameLine();
-			ImGui::Text("%s", Username);
 
 			ImGui::EndChild(); //End of User Status Child
 

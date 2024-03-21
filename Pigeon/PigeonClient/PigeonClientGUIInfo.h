@@ -13,6 +13,8 @@ static enum Page
 	CHAT_PAGE
 };
 
+#define MAX_USERNAME 15
+
 namespace PigeonClientGUIInfo
 {
 	inline bool shouldClose = false;
@@ -32,8 +34,8 @@ namespace PigeonClientGUIInfo
 	inline GLuint your_icon_texture;
 	inline GLuint online_texture, idle_texture, dnd_texture, error_texture;
 	inline const char* status_vec[] = { "ONLINE", "IDLE", "DND" };
-	inline int showMenu = false;
 	inline int currentStatus = 0;
+	inline int showMenu = false;
 
 	inline ImGuiTextBuffer msgBuffer;
 	inline std::string msg = "";
