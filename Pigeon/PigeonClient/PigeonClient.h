@@ -33,6 +33,7 @@ public:
 	void Run();
 	void SendPacket(const PigeonPacket& pkt);
 	
+	void ChangeStatus(const std::string& status);
 	void SendMsg(const std::string& message);
 	void SendFile(const std::string& filepath);
 	void DownloadFile(const std::string& filename);

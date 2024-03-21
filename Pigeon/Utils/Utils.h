@@ -144,6 +144,22 @@ namespace B64 {
 
 namespace GUIUtils
 {
+    inline void generateTexture(std::string imagePath, GLuint& texture)
+    {
+        int temp_size;
+        int channels;
+        unsigned char* my_image_data = stbi_load(imagePath.c_str(), &temp_size, &temp_size, &channels, 4);
+        assert(my_image_data != NULL);
+
+        // Turn the RGBA pixel data into an OpenGL texture:
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, temp_size, temp_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
+
+        stbi_image_free(my_image_data);
+    }
+
     inline void TextCentered(const std::string text) {
         auto windowWidth = ImGui::GetWindowSize().x;
         auto textWidth = ImGui::CalcTextSize(text.c_str()).x;
@@ -161,48 +177,33 @@ namespace GUIUtils
         ImGui::InputText(label, &buf, flags);
     }
 
-    inline void ImageCentered(const char* imagePath, GLuint& texture, int& width, int& height, float aspectRatio, bool& loaded, bool load_first_time_only = true)
-    {
-        //Load image only once if desired (recommended)
-        if (!loaded)
-        {
-            int channels;
-            unsigned char* my_image_data = stbi_load(imagePath, &width, &height, &channels, 4);
-            assert(my_image_data != NULL);
-
-            // Turn the RGBA pixel data into an OpenGL texture:
-            glGenTextures(1, &texture);
-            glBindTexture(GL_TEXTURE_2D, texture);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
-
-            loaded = load_first_time_only ? true : false;
-        }
-        
+    inline void ImageCentered(GLuint& texture, int width, int height)
+    {        
         auto windowWidth = ImGui::GetWindowSize().x;
         
-        ImGui::SetCursorPosX((windowWidth - width * aspectRatio) * 0.5f);
-        ImGui::Image((void*)(intptr_t)texture, ImVec2(width * aspectRatio, height * aspectRatio));
+        ImGui::SetCursorPosX((windowWidth - width) * 0.5f);
+        ImGui::Image((void*)(intptr_t)texture, ImVec2(width, height));
     }
 
-    inline bool RoundButton(std::string label, std::string imagePath, GLuint& texture, int size, bool& loaded, bool load_first_time_only = true) {
-        //Load image only once if desired (recommended)
-        if (!loaded)
-        {
-            int temp_size;
-            int channels;
-            unsigned char* my_image_data = stbi_load(imagePath.c_str(), &temp_size, &temp_size, &channels, 4);
-            assert(my_image_data != NULL);
+    inline bool RoundButton2(std::string label, GLuint& texture, int size) {
+        // Obtener el tamaño deseado para el botón circular
+        const float buttonSize = size;
 
-            // Turn the RGBA pixel data into an OpenGL texture:
-            glGenTextures(1, &texture);
-            glBindTexture(GL_TEXTURE_2D, texture);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, temp_size, temp_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
+        // Calcular el centro del botón circular
+        ImVec2 center = ImGui::GetCursorScreenPos();
+        center.x += buttonSize / 2.0f;
+        center.y += buttonSize / 2.0f;
 
-            loaded = load_first_time_only ? true : false;
-        }
+        // Dibujar un círculo invisible para actuar como área de clic
+        bool val = ImGui::InvisibleButton(label.c_str(), ImVec2(buttonSize, buttonSize));
 
+        // Dibujar la imagen
+        ImGui::GetWindowDrawList()->AddImage((void*)(intptr_t)texture, ImVec2(center.x - buttonSize / 2, center.y - buttonSize / 2), ImVec2(center.x + buttonSize / 2, center.y + buttonSize / 2));
+
+        return val;
+    }
+
+    inline bool RoundButton(std::string label, GLuint& texture, int size) {
         // Obtener el tamaño deseado para el botón circular
         const float buttonSize = size;
 

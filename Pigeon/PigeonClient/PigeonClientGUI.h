@@ -18,6 +18,24 @@
 
 using namespace PigeonClientGUIInfo;
 
+void printMsgBuffer()
+{
+	const char* buf_begin = msgBuffer.begin();
+	const char* buf_end = msgBuffer.end();
+	if (buf_begin != buf_end) {
+		const char* line = buf_begin;
+		for (const char* p = buf_begin; p != buf_end; p++) {
+			if (*p == '\n') {
+				ImGui::TextUnformatted(line, p);
+				ImGui::Separator(); // Añadir una línea de separación después de cada mensaje
+				line = p + 1;
+			}
+		}
+		if (line != buf_end)
+			ImGui::TextUnformatted(line, buf_end);
+	}
+}
+
 namespace PigeonClientGUI
 {
 	PigeonClient* client = nullptr;
@@ -37,7 +55,7 @@ namespace PigeonClientGUI
 			GUIUtils::TextCentered("Welcome to Pigeon");
 
 			//Logo
-			GUIUtils::ImageCentered("Images\\logo2.png", welcome_texture, my_image_width, my_image_height, 0.5, welcome_loaded);
+			GUIUtils::ImageCentered(welcome_texture, 250, 250);
 
 			//Form
 			ImGui::NewLine();
@@ -54,10 +72,10 @@ namespace PigeonClientGUI
 			ImGui::NewLine();
 			if (GUIUtils::ButtonCentered("Connect", 200, 50))
 			{
-				if (Address.empty() || Port.empty() || Username.empty())
-					return;
+				/*if (Address.empty() || Port.empty() || Username.empty())
+					return;*/
 
-				Address = "192.168.100.16";
+				Address = "192.168.1.135";
 				Port = "4444";
 				/*Username = "Ahuesag";*/
 
@@ -69,18 +87,18 @@ namespace PigeonClientGUI
 
 	namespace Chat
 	{
-		std::string getStatusImage(int status)
+		GLuint& getStatusImage(int status)
 		{
 			switch (status)
 			{
 			case 0:
-				return "Images\\online_status.png";
+				return online_texture;
 			case 1:
-				return "Images\\idle_status.png";
+				return idle_texture;
 			case 2:
-				return "Images\\dnd_status.png";
+				return dnd_texture;
 			default:
-				return "Images\\error_status.png";
+				return error_texture;
 			}
 		}
 
@@ -91,15 +109,12 @@ namespace PigeonClientGUI
 
 			ImGui::BeginChild("Connected clients", ImVec2(220, windowHeight - 50), true);
 			
-			std::string statusIcon = "";
-			
-			GLuint temp_texture;
 			for (const auto& pair : Users) {
-				statusIcon = getStatusImage(stoi(pair.second));
-				if (GUIUtils::RoundButton(pair.first, statusIcon, temp_texture, 30, user_icon_loaded, false)) //Fix, utils no reload images
+				if (GUIUtils::RoundButton(pair.first, getStatusImage(stoi(pair.second)), 30)) //Fix, utils no reload images
 				{
 					std::cout << "User: " << pair.first << ", Status: " << pair.second << std::endl;
 				}
+				
 
 				ImGui::SameLine();
 				ImGui::Text("%s", pair.first);
@@ -109,9 +124,29 @@ namespace PigeonClientGUI
 
 			ImGui::BeginChild("User Status", ImVec2(220, 50), true);
 
-			int status = stoi(Users[Username]); //Users[Username] always exists (own username)
-			statusIcon = getStatusImage(status);
-			GUIUtils::RoundButton("your_status", statusIcon, your_icon_texture, 30, your_icon_loaded); //Status menu on click
+			currentStatus = stoi(Users[Username]); //Users[Username] always exists (own username)
+			if (GUIUtils::RoundButton("##your_status", getStatusImage(currentStatus), 30))
+			{
+				showMenu = true;
+			}
+
+			// Menú desplegable
+			if (showMenu) {
+				ImGui::Begin("Status window", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+				if (ImGui::BeginCombo("", status_vec[currentStatus])) {
+					for (int i = 0; i < IM_ARRAYSIZE(status_vec); i++) {
+						bool isSelected = (currentStatus == i);
+						if (ImGui::Selectable(status_vec[i], isSelected))
+							client->ChangeStatus(status_vec[i]);
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();   // Establecer el enfoque en la opción seleccionada
+						
+					}
+					ImGui::EndCombo();
+				}
+				ImGui::End();
+			}
+
 			ImGui::SameLine();
 			ImGui::Text("%s", Username);
 
@@ -126,12 +161,21 @@ namespace PigeonClientGUI
 
 			ImGui::BeginChild("Chat Log", ImVec2(windowWidth - 220, windowHeight - 50), true);
 
+			printMsgBuffer();
+
 			ImGui::EndChild(); //End of Chat Log Child
 
 			ImGui::BeginChild("MSG", ImVec2(windowWidth - 220, 50), true);
 
-			ImGui::PushFont(largeFont);
+			ImGui::PushFont(msgFont);
+			ImGui::PushItemWidth(windowWidth - 220);
+			//ImGui::SetKeyboardFocusHere(0); //Maintain input text always selected
 			ImGui::InputText("##MSG", &msg);
+			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
+				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::TEXT_MESSAGE, Username, String::StringToBytes(msg));
+				client->SendPacket(pkg);
+				msg.clear();
+			}
 
 			ImGui::EndChild(); //End of MSG Child
 
@@ -140,17 +184,11 @@ namespace PigeonClientGUI
 
 		void ChatPage()
 		{
+			//ImGui::ShowDemoWindow();
 			LeftMenu();
 			ImGui::SameLine();
 			RightMenu();
-			return;
 
-			GUIUtils::InputCentered("##sendMsg", msg, 300, ImGuiInputTextFlags_CharsNoBlank);
-			if (GUIUtils::ButtonCentered("Send", 100, 50))
-			{
-				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::TEXT_MESSAGE, Username, String::StringToBytes(msg));
-				client->SendPacket(pkg);
-			}
 		}
 	}
 
@@ -271,7 +309,7 @@ namespace PigeonClientGUI
 		largeFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 50);
 		mediumFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 30);
 		smallFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 20);
-		msgFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 35);
+		msgFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 40);
 
 	}
 

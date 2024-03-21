@@ -178,6 +178,7 @@ void* PigeonClient::ProcessPacket()
 
     std::cout << "CONNECTED TO " << m_servername << std::endl;
 
+    std::string cmsg = "";
     while (true) {
         std::vector<unsigned char> recv = ReadPacket();
 
@@ -197,7 +198,8 @@ void* PigeonClient::ProcessPacket()
                 break;
             }
 
-            std::cout << "CONNECTED USERS: \n";
+            //std::cout << "CONNECTED USERS: \n";
+            std::cout << std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end()) << std::endl;
 
             PigeonClientGUIInfo::Users.clear(); //Clear users map
             for (Json::ValueIterator it = value.begin(); it != value.end(); ++it) {
@@ -206,12 +208,16 @@ void* PigeonClient::ProcessPacket()
                 
                 //Update GUI with updated clients
                 PigeonClientGUIInfo::Users.insert(std::make_pair(key, value));
+
+                std::cout << key << " - " << value << std::endl;
             }
 
 
             break;
         case TEXT_MESSAGE:
             //send message to GUI...
+            cmsg = pkt.HEADER.username + ": " + std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end());
+            PigeonClientGUIInfo::msgBuffer.appendf("%s\n", cmsg.c_str());
             std::cout << pkt.HEADER.username << ": " << std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end()) << std::endl;
             break;
 
@@ -279,6 +285,13 @@ void PigeonClient::SendPacket(const PigeonPacket& pkt)
 {
     auto bytes = SerializePacket(pkt);
     this->m_client->SendAll(bytes);
+}
+
+void PigeonClient::ChangeStatus(const std::string& status)
+{
+    std::string m = R"({"status":)" + std::string(R"(")") + status + std::string(R"(")") + "}";
+    PigeonPacket pkg = BuildPacket(PIGEON_OPCODE::PRESENCE_UPDATE, m_username, String::StringToBytes(m));
+    SendPacket(pkg);
 }
 
 void PigeonClient::SendMsg(const std::string& message)

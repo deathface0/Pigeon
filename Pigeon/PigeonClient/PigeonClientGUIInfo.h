@@ -18,10 +18,10 @@ namespace PigeonClientGUIInfo
 	inline bool shouldClose = false;
 	inline bool shouldDelete = false;
 
-	inline bool shouldLog = false;
-
 	inline int windowWidth = 500;
 	inline int windowHeight = 760;
+
+	inline int currentPage = Page::WELCOME_PAGE, lastPage = Page::WELCOME_PAGE;
 
 	inline ImFont *smallFont, *mediumFont, *largeFont, *msgFont;
 
@@ -29,18 +29,14 @@ namespace PigeonClientGUIInfo
 	inline bool fetchingData = false;
 
 	inline GLuint welcome_texture;
-	inline int my_image_width, my_image_height;
-	inline bool welcome_loaded = false;
-
-	inline GLuint user_icon_texture;
-	inline bool user_icon_loaded = false;
-
 	inline GLuint your_icon_texture;
-	inline bool your_icon_loaded = false;
+	inline GLuint online_texture, idle_texture, dnd_texture, error_texture;
+	inline const char* status_vec[] = { "ONLINE", "IDLE", "DND" };
+	inline int showMenu = false;
+	inline int currentStatus = 0;
 
-	inline int currentPage = Page::WELCOME_PAGE, lastPage = Page::WELCOME_PAGE;
+	inline ImGuiTextBuffer msgBuffer;
 	inline std::string msg = "";
 
 	inline std::map<std::string, std::string> Users;
-	inline std::map<std::string, bool> images;
 }
