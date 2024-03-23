@@ -189,14 +189,20 @@ namespace PigeonClientGUI
 
 			ImGui::BeginChild("MSG", ImVec2(windowWidth - 220, 50), true);
 
+			if (focusMSG) //Only focus InputText when new msg is sent
+			{
+				ImGui::SetKeyboardFocusHere(0); //Maintain input text always selected
+				focusMSG = false;
+			}
 			ImGui::PushFont(msgFont);
 			ImGui::PushItemWidth(windowWidth - 220);
-			//ImGui::SetKeyboardFocusHere(0); //Maintain input text always selected
 			ImGui::InputText("##MSG", &msg);
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
 				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::TEXT_MESSAGE, Username, String::StringToBytes(msg));
 				client->SendPacket(pkg);
 				msg.clear();
+
+				focusMSG = true;
 			}
 
 			ImGui::EndChild(); //End of MSG Child

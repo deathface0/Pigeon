@@ -37,6 +37,7 @@ namespace PigeonClientGUIInfo
 	inline int currentStatus = 0;
 	inline int showMenu = false;
 	inline bool selecting = true;
+	inline bool focusMSG = false;
 
 	inline ImGuiTextBuffer msgBuffer;
 	inline std::string msg = "";
