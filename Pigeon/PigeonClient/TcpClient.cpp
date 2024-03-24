@@ -87,7 +87,7 @@ int TcpClient::Connect() {
 
 int TcpClient::Disconnect()
 {
-    // Cerrar la conexión SSL
+    // Cerrar la conexiï¿½n SSL
     SSL_shutdown(ssl);
     SSL_free(ssl);
 
@@ -149,9 +149,9 @@ int TcpClient::SendAll(const std::string& toSend) {
 }
 
 
-int TcpClient::Recv(std::vector<unsigned char>& buf, size_t toRecv) {
+int TcpClient::Recv(std::vector<unsigned char>& buf, size_t toRecv, int total) {
 
-    int total = 0;
+    
     do {
         int nRecv = SSL_read(ssl, buf.data() + total, toRecv - total);
         if (nRecv <= 0)

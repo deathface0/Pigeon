@@ -57,7 +57,7 @@ public:
     int SendAll(std::vector<unsigned char>& buf);
     int SendAll(const std::string& toSend);
 
-    int Recv(std::vector<unsigned char>& buf, size_t toRecv);
+    int Recv(std::vector<unsigned char>& buf, size_t toRecv,int total=0);
 
 };
 #endif

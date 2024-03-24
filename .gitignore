@@ -18,6 +18,8 @@ Pigeon/ext/lib/avcodec.lib
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+*.out
+.vscode
 # Mono auto generated files
 mono_crash.*
 

@@ -1,4 +1,20 @@
 #pragma once
+//UBUNTU
+#ifdef __linux__
+
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_sdl2.h"
+#include "../imgui/imgui_impl_opengl3.h"
+#include "../imgui/imgui_stdlib.h"
+
+#include "../stb_image/stb_image.h"
+
+
+#include <GL/glew.h>
+
+//MSVC
+#else
+
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl2.h>
@@ -7,6 +23,9 @@
 #include <GLEW/GL/glew.h>
 
 #include "stb_image/stb_image.h"
+
+#endif
+
 
 #include <iostream>
 #include <fstream>
@@ -186,15 +205,15 @@ namespace GUIUtils
     }
 
     inline bool RoundButton2(std::string label, GLuint& texture, int size) {
-        // Obtener el tamaño deseado para el botón circular
+        // Obtener el tamaï¿½o deseado para el botï¿½n circular
         const float buttonSize = size;
 
-        // Calcular el centro del botón circular
+        // Calcular el centro del botï¿½n circular
         ImVec2 center = ImGui::GetCursorScreenPos();
         center.x += buttonSize / 2.0f;
         center.y += buttonSize / 2.0f;
 
-        // Dibujar un círculo invisible para actuar como área de clic
+        // Dibujar un cï¿½rculo invisible para actuar como ï¿½rea de clic
         bool val = ImGui::InvisibleButton(label.c_str(), ImVec2(buttonSize, buttonSize));
 
         // Dibujar la imagen
@@ -204,15 +223,15 @@ namespace GUIUtils
     }
 
     inline bool RoundButton(std::string label, GLuint& texture, int size) {
-        // Obtener el tamaño deseado para el botón circular
+        // Obtener el tamaï¿½o deseado para el botï¿½n circular
         const float buttonSize = size;
 
-        // Calcular el centro del botón circular
+        // Calcular el centro del botï¿½n circular
         ImVec2 center = ImGui::GetCursorScreenPos();
         center.x += buttonSize / 2.0f;
         center.y += buttonSize / 2.0f;
 
-        // Dibujar un círculo invisible para actuar como área de clic
+        // Dibujar un cï¿½rculo invisible para actuar como ï¿½rea de clic
         bool val = ImGui::InvisibleButton(label.c_str(), ImVec2(buttonSize, buttonSize));
 
         // Dibujar la imagen

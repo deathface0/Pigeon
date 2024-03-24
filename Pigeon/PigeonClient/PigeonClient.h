@@ -1,10 +1,14 @@
 #pragma once
 #ifdef _WIN32
+
 #include "WindowsTcpClient.h"
 #include <json/json.h>
+
 #elif __linux__
+
 #include "TcpClient.h"
 #include <jsoncpp/json/json.h>
+
 #endif
 
 #include <iostream>

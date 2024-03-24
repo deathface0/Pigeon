@@ -1,15 +1,33 @@
 #pragma once
 
 #include "PigeonClient.h"
-#include "ImGuiLogger.h"
-#include "Utils/Utils.h"
+#include  "../Utils/Utils.h"
 
 #include <SDL2/SDL.h>
+
+//UBUNTU
+#ifdef __linux__
+
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_sdl2.h"
+#include "../imgui/imgui_impl_opengl3.h"
+#include "../imgui/imgui_stdlib.h"
+
+#include <GL/glew.h>
+
+//MSVC
+#else
+
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_stdlib.h>
 #include <GLEW/GL/glew.h>
+#include "Utils/Utils.h"
+
+
+#endif
 #include <iostream>
 #include <chrono>
 #include <ctime>
@@ -27,7 +45,7 @@ void printMsgBuffer()
 		for (const char* p = buf_begin; p != buf_end; p++) {
 			if (*p == '\n') {
 				ImGui::TextUnformatted(line, p);
-				ImGui::Separator(); // Añadir una línea de separación después de cada mensaje
+				ImGui::Separator(); // Aï¿½adir una lï¿½nea de separaciï¿½n despuï¿½s de cada mensaje
 				line = p + 1;
 			}
 		}
@@ -44,14 +62,12 @@ namespace PigeonClientGUI
     SDL_GLContext glContext = NULL;
     SDL_Event currentEvent;
 
-    ImGuiLog* log = nullptr;
-
 	namespace Welcome
 	{
 		void WelcomePage()
 		{
 			//Title
-			ImGui::PushFont(largeFont);
+			//ImGui::PushFont(largeFont);
 			GUIUtils::TextCentered("Welcome to Pigeon");
 
 			//Logo
@@ -59,7 +75,7 @@ namespace PigeonClientGUI
 
 			//Form
 			ImGui::NewLine();
-			ImGui::PushFont(smallFont);
+			//ImGui::PushFont(smallFont);
 			GUIUtils::TextCentered("Server Address");
 			GUIUtils::InputCentered("##addressField", Address, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
 
@@ -81,8 +97,9 @@ namespace PigeonClientGUI
 					return;
 				}
 
-				Address = "192.168.1.135";
-				Port = "4444";
+				//Address = "192.168.1.135";
+				//Port = "4444";
+				
 				/*Username = "Ahuesag";*/
 
 				client = new PigeonClient(Address, stoi(Port), Username);
@@ -109,7 +126,7 @@ namespace PigeonClientGUI
 		}
 
 		void LeftMenu() {
-			ImGui::PushFont(mediumFont);
+			//ImGui::PushFont(mediumFont);
 
 			ImGui::BeginChild("Left Menu", ImVec2(220, windowHeight), true);
 
@@ -144,7 +161,7 @@ namespace PigeonClientGUI
 			ImGui::SetCursorPos(ImVec2(45, 10));
 			ImGui::Text("%s", Username);
 
-			// Menú desplegable
+			// Menï¿½ desplegable
 			if (showMenu) {
 				ImGui::SetNextWindowPos(ImVec2(0, windowHeight - 180));
 				ImGui::Begin("Status window", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
@@ -165,7 +182,7 @@ namespace PigeonClientGUI
 							showMenu = false;
 						}
 						if (isSelected)
-							ImGui::SetItemDefaultFocus();   // Establecer el enfoque en la opción seleccionada
+							ImGui::SetItemDefaultFocus();   // Establecer el enfoque en la opciï¿½n seleccionada
 					}
 					ImGui::EndCombo();
 				}
@@ -194,7 +211,7 @@ namespace PigeonClientGUI
 				ImGui::SetKeyboardFocusHere(0); //Maintain input text always selected
 				focusMSG = false;
 			}
-			ImGui::PushFont(msgFont);
+			//ImGui::PushFont(msgFont);
 			ImGui::PushItemWidth(windowWidth - 220);
 			ImGui::InputText("##MSG", &msg);
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
@@ -335,10 +352,10 @@ namespace PigeonClientGUI
 		ImGui::GetStyle().ScrollbarRounding = 0.0f;
 		ImGui::GetStyle().FrameRounding = 100.f;
 
-		largeFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 50);
-		mediumFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 30);
-		smallFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 20);
-		msgFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts\\MadimiOne-Regular.ttf", 40);
+		//largeFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 50);
+		//mediumFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 30);
+		//smallFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 20);
+		//msgFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 40);
 
 	}
 

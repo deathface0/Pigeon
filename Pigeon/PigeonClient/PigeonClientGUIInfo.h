@@ -1,13 +1,31 @@
 #include <string>
 #include <map>
 #include <unordered_map>
+
+
+//UBUNTU
+#ifdef __linux__
+
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_sdl2.h"
+#include "../imgui/imgui_impl_opengl3.h"
+#include "../imgui/imgui_stdlib.h"
+
+#include <GL/glew.h>
+
+//MSVC
+#else
+
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_stdlib.h>
 #include <GLEW/GL/glew.h>
 
-static enum Page
+#endif
+
+enum Page
 {
 	WELCOME_PAGE = 0,
 	CHAT_PAGE
