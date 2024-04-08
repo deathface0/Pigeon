@@ -142,7 +142,7 @@ namespace PigeonClientGUI
 
 				ImGui::SameLine();
 				ImGui::SetCursorPosX(clientStatusPos.x + 35);
-				ImGui::Text("%s", pair.first);
+				ImGui::Text("%s", pair.first.c_str());
 
 				clientStatusPos.y += 40;
 			}
@@ -159,7 +159,7 @@ namespace PigeonClientGUI
 			}
 			ImGui::SameLine();
 			ImGui::SetCursorPos(ImVec2(45, 10));
-			ImGui::Text("%s", Username);
+			ImGui::Text("%s", Username.c_str());
 
 			// Men� desplegable
 			if (showMenu) {
@@ -171,7 +171,7 @@ namespace PigeonClientGUI
 
 				selecting = false;
 				ImGui::SetNextItemWidth(220);
-				if (ImGui::BeginCombo("", status_vec[currentStatus])) {
+				if (ImGui::BeginCombo("##A", status_vec[currentStatus])) {
 					selecting = true;
 
 					for (int i = 0; i < IM_ARRAYSIZE(status_vec); i++) {
@@ -352,10 +352,10 @@ namespace PigeonClientGUI
 		ImGui::GetStyle().ScrollbarRounding = 0.0f;
 		ImGui::GetStyle().FrameRounding = 100.f;
 
-		//largeFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 50);
-		//mediumFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 30);
-		//smallFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 20);
-		//msgFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 40);
+		largeFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 50);
+		mediumFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 30);
+		smallFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 20);
+		msgFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 40);
 
 	}
 

@@ -189,6 +189,8 @@ void* PigeonClient::ProcessPacket()
 
         auto pkt = DeserializePacket(recv);
 
+        std::cout << std::hex << pkt.HEADER.OPCODE << std::dec << std::endl;
+
         switch (pkt.HEADER.OPCODE)
         {
         case PRESENCE_UPDATE:
@@ -203,6 +205,8 @@ void* PigeonClient::ProcessPacket()
                 std::string key = it.key().asString();
                 std::string value = (*it).asString();
                 
+                std::cout << value << std::endl;
+
                 //Update GUI with updated clients
                 PigeonClientGUIInfo::Users.insert(std::make_pair(key, value));
             }
@@ -285,7 +289,12 @@ void PigeonClient::SendPacket(const PigeonPacket& pkt)
 void PigeonClient::ChangeStatus(const std::string& status)
 {
     std::string m = R"({"status":)" + std::string(R"(")") + status + std::string(R"(")") + "}";
+    
+
     PigeonPacket pkg = BuildPacket(PIGEON_OPCODE::PRESENCE_UPDATE, m_username, String::StringToBytes(m));
+    
+    String::printBytesInHex(SerializePacket(pkg));
+    
     SendPacket(pkg);
 }
 

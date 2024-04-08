@@ -184,7 +184,7 @@ namespace GUIUtils
         auto textWidth = ImGui::CalcTextSize(text.c_str()).x;
 
         ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
-        ImGui::Text(text.c_str());
+        ImGui::Text("%s",text.c_str());
     }
 
     inline void InputCentered(const char* label, std::string& buf , float width, ImGuiInputTextFlags flags)
