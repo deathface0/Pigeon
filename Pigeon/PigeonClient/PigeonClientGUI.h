@@ -67,7 +67,7 @@ namespace PigeonClientGUI
 		void WelcomePage()
 		{
 			//Title
-			//ImGui::PushFont(largeFont);
+			ImGui::PushFont(largeFont);
 			GUIUtils::TextCentered("Welcome to Pigeon");
 
 			//Logo
@@ -75,7 +75,7 @@ namespace PigeonClientGUI
 
 			//Form
 			ImGui::NewLine();
-			//ImGui::PushFont(smallFont);
+			ImGui::PushFont(smallFont);
 			GUIUtils::TextCentered("Server Address");
 			GUIUtils::InputCentered("##addressField", Address, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
 
@@ -97,8 +97,8 @@ namespace PigeonClientGUI
 					return;
 				}
 
-				//Address = "192.168.1.135";
-				//Port = "4444";
+				Address = "192.168.1.135";
+				Port = "4444";
 				
 				/*Username = "Ahuesag";*/
 
@@ -126,7 +126,7 @@ namespace PigeonClientGUI
 		}
 
 		void LeftMenu() {
-			//ImGui::PushFont(mediumFont);
+			ImGui::PushFont(mediumFont);
 
 			ImGui::BeginChild("Left Menu", ImVec2(220, windowHeight), true);
 
@@ -211,8 +211,8 @@ namespace PigeonClientGUI
 				ImGui::SetKeyboardFocusHere(0); //Maintain input text always selected
 				focusMSG = false;
 			}
-			//ImGui::PushFont(msgFont);
-			ImGui::PushItemWidth(windowWidth - 220);
+			ImGui::PushFont(msgFont);
+			ImGui::PushItemWidth(windowWidth - 270);
 			ImGui::InputText("##MSG", &msg);
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
 				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::TEXT_MESSAGE, Username, String::StringToBytes(msg));
@@ -220,6 +220,10 @@ namespace PigeonClientGUI
 				msg.clear();
 
 				focusMSG = true;
+			}
+			ImGui::SameLine();
+			if (ImGui::ImageButton((void*)(intptr_t)file_texture, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+				std::cout << File::selectFile() << std::endl;
 			}
 
 			ImGui::EndChild(); //End of MSG Child
@@ -233,7 +237,6 @@ namespace PigeonClientGUI
 			LeftMenu();
 			ImGui::SameLine();
 			RightMenu();
-
 		}
 	}
 
@@ -418,12 +421,20 @@ namespace PigeonClientGUI
 				ImGui::GetStyle().WindowPadding = ImVec2(0.00f, 0.00f);
 				ImGui::GetStyle().FrameRounding = 0.f;
 				ImGui::GetStyle().ItemSpacing = ImVec2(0.00f, 0.00f);
+
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 1.f));
 			}
 			else if (currentPage == Page::WELCOME_PAGE)
 			{
 				SDL_SetWindowSize(sdlWindow, 500, 760);
 				ImGui::GetStyle().WindowPadding = ImVec2(8.00f, 8.00f);
 				ImGui::GetStyle().ItemSpacing = ImVec2(6.00f, 6.00f);
+
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.796f, 0.592f, 0.357f, 1.00f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.19f, 0.19f, 0.19f, 0.54f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.20f, 0.22f, 0.23f, 1.00f));
 			}
 		}
 		lastPage = currentPage;

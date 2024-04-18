@@ -89,6 +89,31 @@ namespace File {
     static unsigned char* loadImage(const char* filename, int* width, int* height, int* channels) {
         return stbi_load(filename, width, height, channels, STBI_rgb_alpha);
     }
+
+    static std::string selectFile()
+    {
+        OPENFILENAMEW ofn;
+        wchar_t szFileName[MAX_PATH] = L"";
+
+        ZeroMemory(&ofn, sizeof(OPENFILENAMEW));
+        ofn.lStructSize = sizeof(OPENFILENAMEW);
+        ofn.hwndOwner = NULL; // Ventana principal (o NULL si no es relevante)
+        ofn.lpstrFilter = L"All Files (*.*)\0*.*\0"; // Filtros de archivos
+        ofn.lpstrFile = szFileName; // Almacena la ruta del archivo seleccionado
+        ofn.nMaxFile = MAX_PATH;
+        ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+
+        // Abre el cuadro de diálogo de selección de archivos
+        if (GetOpenFileNameW(&ofn) == TRUE) {
+            // szFileName ahora contiene la ruta del archivo seleccionado
+            // Convertir wchar_t a char
+            int size_needed = WideCharToMultiByte(CP_UTF8, 0, szFileName, -1, NULL, 0, NULL, NULL);
+            std::string filePath(size_needed, 0);
+            WideCharToMultiByte(CP_UTF8, 0, szFileName, -1, &filePath[0], size_needed, NULL, NULL);
+            return filePath;
+        }
+        return "";
+    }
 }
 
 namespace String {

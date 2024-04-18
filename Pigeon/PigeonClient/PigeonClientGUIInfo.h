@@ -50,6 +50,7 @@ namespace PigeonClientGUIInfo
 
 	inline GLuint welcome_texture;
 	inline GLuint your_icon_texture;
+	inline GLuint file_texture;
 	inline GLuint online_texture, idle_texture, dnd_texture, error_texture;
 	inline const char* status_vec[] = { "ONLINE", "IDLE", "DND" };
 	inline int currentStatus = 0;
