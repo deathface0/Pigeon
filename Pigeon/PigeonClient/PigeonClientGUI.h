@@ -71,7 +71,7 @@ namespace PigeonClientGUI
 			GUIUtils::TextCentered("Welcome to Pigeon");
 
 			//Logo
-			GUIUtils::ImageCentered(welcome_texture, 250, 250);
+			GUIUtils::ImageCentered(Texture::welcome, 250, 250);
 
 			//Form
 			ImGui::NewLine();
@@ -115,13 +115,13 @@ namespace PigeonClientGUI
 			switch (status)
 			{
 			case 0:
-				return online_texture;
+				return Texture::online;
 			case 1:
-				return idle_texture;
+				return Texture::idle;
 			case 2:
-				return dnd_texture;
+				return Texture::dnd;
 			default:
-				return error_texture;
+				return Texture::error;
 			}
 		}
 
@@ -161,7 +161,7 @@ namespace PigeonClientGUI
 			ImGui::SetCursorPos(ImVec2(45, 10));
 			ImGui::Text("%s", Username.c_str());
 
-			// Men� desplegable
+			// Menu desplegable
 			if (showMenu) {
 				ImGui::SetNextWindowPos(ImVec2(0, windowHeight - 180));
 				ImGui::Begin("Status window", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
@@ -212,7 +212,7 @@ namespace PigeonClientGUI
 				focusMSG = false;
 			}
 			ImGui::PushFont(msgFont);
-			ImGui::PushItemWidth(windowWidth - 270);
+			ImGui::PushItemWidth(windowWidth - 320);
 			ImGui::InputText("##MSG", &msg);
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
 				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::TEXT_MESSAGE, Username, String::StringToBytes(msg));
@@ -222,8 +222,14 @@ namespace PigeonClientGUI
 				focusMSG = true;
 			}
 			ImGui::SameLine();
-			if (ImGui::ImageButton((void*)(intptr_t)file_texture, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+			if (ImGui::ImageButton((void*)(intptr_t)Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 				std::cout << File::selectFile() << std::endl;
+				
+			}
+			ImGui::SameLine();
+			if (ImGui::ImageButton((void*)(intptr_t)Texture::disconnect, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::PRESENCE_UPDATE, Username, String::StringToBytes("DISCONNECT"));
+				client->SendPacket(pkg);
 			}
 
 			ImGui::EndChild(); //End of MSG Child
@@ -354,12 +360,17 @@ namespace PigeonClientGUI
 		ImGui::GetStyle().PopupRounding = 0.0f;
 		ImGui::GetStyle().ScrollbarRounding = 0.0f;
 		ImGui::GetStyle().FrameRounding = 100.f;
+	}
 
-		largeFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 50);
-		mediumFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 30);
-		smallFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 20);
-		msgFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Fonts/MadimiOne-Regular.ttf", 40);
+	void SetChatStyle()
+	{
+		ImGui::GetStyle().WindowPadding = ImVec2(0.00f, 0.00f);
+		ImGui::GetStyle().FrameRounding = 0.f;
+		ImGui::GetStyle().ItemSpacing = ImVec2(0.00f, 0.00f);
 
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 1.f));
 	}
 
     void SetUpImGui() {
@@ -413,43 +424,21 @@ namespace PigeonClientGUI
 
 		//Detect page change and set styles/size
 		currentPage = client && client->isConnected() ? Page::CHAT_PAGE : Page::WELCOME_PAGE;
-		if (currentPage != lastPage)
-		{
-			if (currentPage == Page::CHAT_PAGE)
-			{
-				SDL_SetWindowSize(sdlWindow, 1280, 720);
-				ImGui::GetStyle().WindowPadding = ImVec2(0.00f, 0.00f);
-				ImGui::GetStyle().FrameRounding = 0.f;
-				ImGui::GetStyle().ItemSpacing = ImVec2(0.00f, 0.00f);
-
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 1.f));
-			}
-			else if (currentPage == Page::WELCOME_PAGE)
-			{
-				SDL_SetWindowSize(sdlWindow, 500, 760);
-				ImGui::GetStyle().WindowPadding = ImVec2(8.00f, 8.00f);
-				ImGui::GetStyle().ItemSpacing = ImVec2(6.00f, 6.00f);
-
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.796f, 0.592f, 0.357f, 1.00f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.19f, 0.19f, 0.19f, 0.54f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.20f, 0.22f, 0.23f, 1.00f));
-			}
-		}
-		lastPage = currentPage;
 
 		//Select current page
 		switch (currentPage)
 		{
 		case Page::WELCOME_PAGE:
+			SDL_SetWindowSize(sdlWindow, 500, 760);
+			SetUpStyle();
 			Welcome::WelcomePage();
 			break;
 		case Page::CHAT_PAGE:
+			SDL_SetWindowSize(sdlWindow, 1280, 720);
+			SetChatStyle();
 			Chat::ChatPage();
 			break;
 		}
-		
     }
 
 	void Cleanup() {

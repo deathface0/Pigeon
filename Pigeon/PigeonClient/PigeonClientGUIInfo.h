@@ -41,17 +41,13 @@ namespace PigeonClientGUIInfo
 	inline int windowWidth = 500;
 	inline int windowHeight = 760;
 
-	inline int currentPage = Page::WELCOME_PAGE, lastPage = Page::WELCOME_PAGE;
+	inline int currentPage = Page::WELCOME_PAGE;
 
 	inline ImFont *smallFont, *mediumFont, *largeFont, *msgFont;
 
 	inline std::string Username, Address, Port;
 	inline bool fetchingData = false;
 
-	inline GLuint welcome_texture;
-	inline GLuint your_icon_texture;
-	inline GLuint file_texture;
-	inline GLuint online_texture, idle_texture, dnd_texture, error_texture;
 	inline const char* status_vec[] = { "ONLINE", "IDLE", "DND" };
 	inline int currentStatus = 0;
 	inline int showMenu = false;
@@ -62,4 +58,11 @@ namespace PigeonClientGUIInfo
 	inline std::string msg = "";
 
 	inline std::map<std::string, std::string> Users;
+}
+
+namespace Texture {
+	inline GLuint welcome;
+	inline GLuint your_icon;
+	inline GLuint upload, disconnect;
+	inline GLuint online, idle, dnd, error;
 }

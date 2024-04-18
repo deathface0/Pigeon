@@ -98,11 +98,14 @@ std::vector<unsigned char> PigeonClient::SerializePacket(const PigeonPacket& pac
 
 PigeonPacket PigeonClient::DeserializePacket(std::vector<unsigned char>& packet)
 {
-    PigeonPacket packetRet;
+    if (packet.empty())
+        return PigeonPacket();
 
+    PigeonPacket packetRet;
 
     int offset = 0;
 
+    String::printBytesInHex(packet);
     std::memcpy(&packetRet.HEADER.HEADER_LENGTH, &packet[offset], sizeof(int));
     offset += sizeof(int);
 
@@ -184,6 +187,7 @@ void* PigeonClient::ProcessPacket()
 
         if (recv.empty()) {
             //Disconnect & handle GUI
+            m_connected = false;
             return nullptr;
         }
 
