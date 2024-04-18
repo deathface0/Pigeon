@@ -59,6 +59,8 @@ private:
 
 public:
 	inline std::string GetUsername() const { return this->m_username; }
+	inline std::string GetServername() const { return this->m_servername; }
+
 private:
 #ifdef _WIN32
 	WindowsTcpClient* m_client = nullptr;

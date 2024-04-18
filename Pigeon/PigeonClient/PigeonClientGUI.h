@@ -202,7 +202,22 @@ namespace PigeonClientGUI
 		{
 			ImGui::BeginChild("Chat", ImVec2(windowWidth - 220, windowHeight), true);
 
-			ImGui::BeginChild("Chat Log", ImVec2(windowWidth - 220, windowHeight - 50), true);
+			ImGui::BeginChild("Chat Info", ImVec2(windowWidth - 220, 50), true);
+			
+			ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(0.525, 0.502, 0.89, 1.00f);
+			ImGui::SetCursorPosY(10);
+			ImGui::SetCursorPosX(infoPos);
+			ImGui::Text("Connected to \"%s\"", client->GetServername().c_str());
+			infoPos++;
+			if (infoPos >= windowWidth - 220)
+				infoPos = -ImGui::GetItemRectSize().x;
+			
+			ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+			//std::cout << ImGui::GetItemRectSize().x << std::endl;
+
+			ImGui::EndChild();
+
+			ImGui::BeginChild("Chat Log", ImVec2(windowWidth - 220, windowHeight - 100), true);
 
 			printMsgBuffer();
 			ImGui::SetScrollHereY(1.0f); //Always stay on the bottom side of the chat
@@ -217,7 +232,7 @@ namespace PigeonClientGUI
 				focusMSG = false;
 			}
 			ImGui::PushFont(Font::OpenSans::px40);
-			ImGui::PushItemWidth(windowWidth - 320);
+			ImGui::PushItemWidth(windowWidth - 370);
 			ImGui::InputText("##MSG", &msg);
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
 				focusMSG = true;
@@ -232,6 +247,10 @@ namespace PigeonClientGUI
 			if (ImGui::ImageButton((void*)(intptr_t)Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 				std::cout << File::selectFile() << std::endl;
 				
+			}
+			ImGui::SameLine();
+			if (ImGui::ImageButton((void*)(intptr_t)Texture::settings, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+				settings = true;
 			}
 			ImGui::SameLine();
 			if (ImGui::ImageButton((void*)(intptr_t)Texture::disconnect, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
@@ -253,7 +272,13 @@ namespace PigeonClientGUI
 		}
 	}
 
-	
+	namespace Settings
+	{
+		void SettingsPage()
+		{
+			ImGui::Text("Settings");
+		}
+	}
 
 
     int CreateImGuiWindow()
@@ -430,20 +455,30 @@ namespace PigeonClientGUI
 		ImGui::SetWindowSize(newSize);
 
 		//Detect page change and set styles/size
-		currentPage = client && client->isConnected() ? Page::CHAT_PAGE : Page::WELCOME_PAGE;
+		if (!client || !client->isConnected())
+			currentPage = Page::WELCOME;
+		else if (settings)
+			currentPage = Page::SETTINGS;
+		else
+			currentPage = Page::CHAT;
 
 		//Select current page
 		switch (currentPage)
 		{
-		case Page::WELCOME_PAGE:
+		case Page::WELCOME:
 			SDL_SetWindowSize(sdlWindow, 500, 760);
 			SetUpStyle();
 			Welcome::WelcomePage();
 			break;
-		case Page::CHAT_PAGE:
+		case Page::CHAT:
 			SDL_SetWindowSize(sdlWindow, 1280, 720);
 			SetChatStyle();
 			Chat::ChatPage();
+			break;
+		case Page::SETTINGS:
+			SDL_SetWindowSize(sdlWindow, 1280, 720);
+			SetChatStyle();
+			Settings::SettingsPage();
 			break;
 		}
     }

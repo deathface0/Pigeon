@@ -27,8 +27,9 @@
 
 enum Page
 {
-	WELCOME_PAGE = 0,
-	CHAT_PAGE
+	WELCOME = 0,
+	CHAT,
+	SETTINGS
 };
 
 #define MAX_USERNAME 15
@@ -41,7 +42,10 @@ namespace PigeonClientGUIInfo
 	inline int windowWidth = 500;
 	inline int windowHeight = 760;
 
-	inline int currentPage = Page::WELCOME_PAGE;
+	inline int infoPos = 0;
+
+	inline bool settings = false;
+	inline int currentPage = Page::WELCOME;
 
 	inline std::string Username, Address, Port;
 	inline bool fetchingData = false;
@@ -61,7 +65,7 @@ namespace PigeonClientGUIInfo
 namespace Texture {
 	inline GLuint welcome;
 	inline GLuint your_icon;
-	inline GLuint upload, disconnect;
+	inline GLuint upload, settings, disconnect;
 	inline GLuint online, idle, dnd, error;
 }
 
