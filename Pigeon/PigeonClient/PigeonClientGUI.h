@@ -201,6 +201,7 @@ namespace PigeonClientGUI
 			ImGui::BeginChild("Chat Log", ImVec2(windowWidth - 220, windowHeight - 50), true);
 
 			printMsgBuffer();
+			ImGui::SetScrollHereY(1.0f); //Always stay on the bottom side of the chat
 
 			ImGui::EndChild(); //End of Chat Log Child
 
@@ -215,11 +216,13 @@ namespace PigeonClientGUI
 			ImGui::PushItemWidth(windowWidth - 320);
 			ImGui::InputText("##MSG", &msg);
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
-				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::TEXT_MESSAGE, Username, String::StringToBytes(msg));
-				client->SendPacket(pkg);
-				msg.clear();
-
 				focusMSG = true;
+				if (!msg.empty())
+				{
+					PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::TEXT_MESSAGE, Username, String::StringToBytes(msg));
+					client->SendPacket(pkg);
+					msg.clear();
+				}
 			}
 			ImGui::SameLine();
 			if (ImGui::ImageButton((void*)(intptr_t)Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
