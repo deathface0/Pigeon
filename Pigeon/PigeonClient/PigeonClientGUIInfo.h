@@ -43,8 +43,6 @@ namespace PigeonClientGUIInfo
 
 	inline int currentPage = Page::WELCOME_PAGE;
 
-	inline ImFont *smallFont, *mediumFont, *largeFont, *msgFont;
-
 	inline std::string Username, Address, Port;
 	inline bool fetchingData = false;
 
@@ -65,4 +63,13 @@ namespace Texture {
 	inline GLuint your_icon;
 	inline GLuint upload, disconnect;
 	inline GLuint online, idle, dnd, error;
+}
+
+namespace Font {
+	namespace MadimiOne {
+		inline ImFont* px10, *px20, *px30, *px40, *px50;
+	}
+	namespace OpenSans {
+		inline ImFont* px10, *px20, *px30, *px40, *px50;
+	}
 }

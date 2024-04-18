@@ -44,13 +44,17 @@ void printMsgBuffer()
 		const char* line = buf_begin;
 		for (const char* p = buf_begin; p != buf_end; p++) {
 			if (*p == '\n') {
+				ImGui::SetCursorPosX(10);
 				ImGui::TextUnformatted(line, p);
 				ImGui::Separator(); // A�adir una l�nea de separaci�n despu�s de cada mensaje
 				line = p + 1;
 			}
 		}
 		if (line != buf_end)
+		{
+			ImGui::SetCursorPosX(10);
 			ImGui::TextUnformatted(line, buf_end);
+		}
 	}
 }
 
@@ -67,7 +71,7 @@ namespace PigeonClientGUI
 		void WelcomePage()
 		{
 			//Title
-			ImGui::PushFont(largeFont);
+			ImGui::PushFont(Font::MadimiOne::px50);
 			GUIUtils::TextCentered("Welcome to Pigeon");
 
 			//Logo
@@ -75,7 +79,7 @@ namespace PigeonClientGUI
 
 			//Form
 			ImGui::NewLine();
-			ImGui::PushFont(smallFont);
+			ImGui::PushFont(Font::MadimiOne::px20);
 			GUIUtils::TextCentered("Server Address");
 			GUIUtils::InputCentered("##addressField", Address, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
 
@@ -126,7 +130,7 @@ namespace PigeonClientGUI
 		}
 
 		void LeftMenu() {
-			ImGui::PushFont(mediumFont);
+			ImGui::PushFont(Font::OpenSans::px30);
 
 			ImGui::BeginChild("Left Menu", ImVec2(220, windowHeight), true);
 
@@ -212,7 +216,7 @@ namespace PigeonClientGUI
 				ImGui::SetKeyboardFocusHere(0); //Maintain input text always selected
 				focusMSG = false;
 			}
-			ImGui::PushFont(msgFont);
+			ImGui::PushFont(Font::OpenSans::px40);
 			ImGui::PushItemWidth(windowWidth - 320);
 			ImGui::InputText("##MSG", &msg);
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
