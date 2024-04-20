@@ -90,7 +90,7 @@ namespace PigeonClientGUI
 			GUIUtils::InputCentered("##usernameField", Username, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
 
 			ImGui::NewLine();
-			if (GUIUtils::ButtonCentered("Connect", 200, 50))
+			if (GUIUtils::ButtonCentered("Connect", 200, 50) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
 			{
 				/*if (Address.empty() || Port.empty() || Username.empty())
 					return;*/
@@ -244,7 +244,7 @@ namespace PigeonClientGUI
 				}
 			}
 			ImGui::SameLine();
-			if (ImGui::ImageButton((void*)(intptr_t)Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+			if (GUIUtils::ImageButton("Upload", Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 #ifdef _WIN32
 				std::string filepath = File::selectFile();
 
@@ -267,11 +267,11 @@ namespace PigeonClientGUI
 #endif
 			}
 			ImGui::SameLine();
-			if (ImGui::ImageButton((void*)(intptr_t)Texture::settings, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+			if (GUIUtils::ImageButton("Settings", Texture::settings, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 				settings = true;
 			}
 			ImGui::SameLine();
-			if (ImGui::ImageButton((void*)(intptr_t)Texture::disconnect, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+			if (GUIUtils::ImageButton("Disconnect", Texture::disconnect, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::PRESENCE_UPDATE, Username, String::StringToBytes("DISCONNECT"));
 				client->SendPacket(pkg);
 			}
