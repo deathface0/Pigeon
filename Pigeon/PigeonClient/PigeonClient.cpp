@@ -219,8 +219,9 @@ void* PigeonClient::ProcessPacket()
             break;
         case TEXT_MESSAGE:
             //send message to GUI...
-            cmsg = pkt.HEADER.username + ": " + std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end());
-            PigeonClientGUIInfo::msgBuffer.appendf("%s\n", cmsg.c_str());
+            cmsg = std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end());
+            //PigeonClientGUIInfo::msgBuffer.appendf("%s\n", cmsg.c_str());
+            PigeonClientGUIInfo::msgBuffer.push_back({ MSG_TYPE::PIGEON_TEXT, pkt.HEADER.username, cmsg });
             std::cout << pkt.HEADER.username << ": " << std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end()) << std::endl;
             break;
 
@@ -232,14 +233,13 @@ void* PigeonClient::ProcessPacket()
                 break;
             }
 
-            std::string filename = value["filename"].asString();
-            
-
-
+            std::string filename = value["filename"].asString() + "." + value["ext"].asString();
 
             if (filename.empty()) {
                 break;
             }
+
+            PigeonClientGUIInfo::msgBuffer.push_back({ MSG_TYPE::PIGEON_FILE, pkt.HEADER.username, filename });
 
             std::cout << "New media file by: " << pkt.HEADER.username << " Filename: " << filename << std::endl;
             filePaths.push_back(filename);

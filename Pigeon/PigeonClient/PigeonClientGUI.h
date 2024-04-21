@@ -15,9 +15,12 @@
 
 #include <GL/glew.h>
 
+#include "PigeonClient/PigeonClient.h"
+
 //MSVC
 #else
 
+#include "PigeonClient/PigeonClient.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl2.h>
@@ -36,28 +39,6 @@
 
 using namespace PigeonClientGUIInfo;
 
-void printMsgBuffer()
-{
-	const char* buf_begin = msgBuffer.begin();
-	const char* buf_end = msgBuffer.end();
-	if (buf_begin != buf_end) {
-		const char* line = buf_begin;
-		for (const char* p = buf_begin; p != buf_end; p++) {
-			if (*p == '\n') {
-				ImGui::SetCursorPosX(10);
-				ImGui::TextUnformatted(line, p);
-				ImGui::Separator(); // A�adir una l�nea de separaci�n despu�s de cada mensaje
-				line = p + 1;
-			}
-		}
-		if (line != buf_end)
-		{
-			ImGui::SetCursorPosX(10);
-			ImGui::TextUnformatted(line, buf_end);
-		}
-	}
-}
-
 namespace PigeonClientGUI
 {
 	PigeonClient* client = nullptr;
@@ -75,7 +56,7 @@ namespace PigeonClientGUI
 			GUIUtils::TextCentered("Welcome to Pigeon");
 
 			//Logo
-			GUIUtils::ImageCentered(Texture::welcome, 250, 250);
+			GUIUtils::ImageCentered("Logo", Texture::welcome, 250, 250);
 
 			//Form
 			ImGui::NewLine();
@@ -126,6 +107,62 @@ namespace PigeonClientGUI
 				return Texture::dnd;
 			default:
 				return Texture::error;
+			}
+		}
+
+		void renderFileUpload(std::string username, std::string filename, std::string ext)
+		{
+			static int numFiles = 0;
+			std::string label = "File" + std::to_string(numFiles++);
+
+			ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, 100), true);
+
+			if (ext != ".png" && ext != ".jpg" && ext != ".jpeg")
+			{
+				ImGui::SetCursorPosX(10); ImGui::Text("%s:", username);
+				ImGui::Dummy(ImVec2(0.0f, 10.0f)); ImGui::SetCursorPosX(7); GUIUtils::Image(label, Texture::file, 40, 40);
+				ImGui::SameLine();
+				ImGui::Text("%s%s", filename, ext);
+			}
+			else {
+				//RENDER IMAGE
+			}
+
+			ImGui::EndChild();
+		}
+
+		void printMsgBuffer()
+		{
+			for (const auto& msg : msgBuffer)
+			{
+				switch (msg.type) {
+				case MSG_TYPE::PIGEON_TEXT:
+					ImGui::SetCursorPosX(10);
+					ImGui::Text("%s: %s", msg.username, msg.content);
+					ImGui::Separator();
+					break;
+				case MSG_TYPE::PIGEON_FILE:
+					size_t pos = msg.content.find_last_of('.');
+					std::string filename = msg.content.substr(0, pos);
+					std::string ext;
+
+					if (pos != std::string::npos) {
+						ext = msg.content.substr(pos + 1);
+						std::cout << "Extensión de archivo: " << ext << std::endl;
+
+						if (!ext.empty()) {
+							ext = '.' + ext;
+						}
+					}
+
+					//Converting extension to lowercase
+					std::transform(ext.begin(), ext.end(), ext.begin(),
+						[](unsigned char c) { return std::tolower(c); });
+
+					renderFileUpload(msg.username, filename, ext);
+					ImGui::Separator();
+					break;
+				}
 			}
 		}
 
@@ -253,7 +290,7 @@ namespace PigeonClientGUI
 
 				size_t lastDotPos = filenameWithExt.find_last_of('.');
 				std::string filename = filenameWithExt.substr(0, lastDotPos);
-				std::string extension = filenameWithExt.substr(lastDotPos + 1);
+				std::string extension = (lastDotPos != std::string::npos) ? filenameWithExt.substr(lastDotPos + 1) : "";
 				extension.erase(std::remove(extension.begin(), extension.end(), '\0'), extension.end());
 
 				if (!filepath.empty())
@@ -275,7 +312,7 @@ namespace PigeonClientGUI
 				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::PRESENCE_UPDATE, Username, String::StringToBytes("DISCONNECT"));
 				client->SendPacket(pkg);
 			}
-
+			
 			ImGui::EndChild(); //End of MSG Child
 
 			ImGui::EndChild(); //End of Chat Child
@@ -436,6 +473,8 @@ namespace PigeonClientGUI
         ImGui_ImplSDL2_InitForOpenGL(sdlWindow, glContext);
         ImGui_ImplOpenGL3_Init("#version 330 core");
         SetUpStyle();
+
+		ImGui::GetIO().IniFilename = NULL;
     }
 
     void StartImGuiFrame() {

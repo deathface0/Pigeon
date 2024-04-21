@@ -1,6 +1,7 @@
 #include <string>
 #include <map>
 #include <unordered_map>
+#include <queue>
 
 
 //UBUNTU
@@ -32,7 +33,20 @@ enum Page
 	SETTINGS
 };
 
-#define MAX_USERNAME 15
+enum MSG_TYPE
+{
+	PIGEON_TEXT,
+	PIGEON_FILE
+};
+
+static struct GUI_MSG
+{
+	MSG_TYPE type;
+	std::string username;
+	std::string content;
+};
+
+#define MAX_USERNAME 20
 
 namespace PigeonClientGUIInfo
 {
@@ -56,7 +70,8 @@ namespace PigeonClientGUIInfo
 	inline bool selecting = true;
 	inline bool focusMSG = false;
 
-	inline ImGuiTextBuffer msgBuffer;
+	//inline ImGuiTextBuffer msgBuffer;
+	inline std::vector<GUI_MSG> msgBuffer;
 	inline std::string msg = "";
 
 	inline std::map<std::string, std::string> Users;
@@ -67,6 +82,7 @@ namespace Texture {
 	inline GLuint your_icon;
 	inline GLuint upload, settings, disconnect;
 	inline GLuint online, idle, dnd, error;
+	inline GLuint file;
 }
 
 namespace Font {

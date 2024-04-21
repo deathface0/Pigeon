@@ -221,14 +221,6 @@ namespace GUIUtils
         ImGui::InputText(label, &buf, flags);
     }
 
-    inline void ImageCentered(GLuint& texture, int width, int height)
-    {        
-        auto windowWidth = ImGui::GetWindowSize().x;
-        
-        ImGui::SetCursorPosX((windowWidth - width) * 0.5f);
-        ImGui::Image((void*)(intptr_t)texture, ImVec2(width, height));
-    }
-
     inline bool RoundButton2(std::string label, GLuint& texture, int size) {
         // Obtener el tama�o deseado para el bot�n circular
         const float buttonSize = size;
@@ -271,6 +263,23 @@ namespace GUIUtils
 
         ImGui::SetCursorPosX((windowWidth - width) * 0.5f);
         return ImGui::Button(label, ImVec2{ width, height });
+    }
+
+    inline void ImageCentered(std::string id, GLuint& texture, int width, int height)
+    {
+        auto windowWidth = ImGui::GetWindowSize().x;
+        ImGui::SetCursorPosX((windowWidth - width) * 0.5f);
+
+        ImGui::PushID(id.c_str());
+        ImGui::Image((void*)(intptr_t)texture, ImVec2(width, height));
+        ImGui::PopID();
+    }
+
+    inline void Image(std::string id, GLuint& texture, int width, int height)
+    {
+        ImGui::PushID(id.c_str());
+        ImGui::Image((void*)(intptr_t)texture, ImVec2(width, height));
+        ImGui::PopID();
     }
 
     inline bool ImageButton(std::string id, GLuint texture, const ImVec2& size, const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1), int frame_padding = -1, const ImVec4& bg_col = ImVec4(0, 0, 0, 0), const ImVec4& tint_col = ImVec4(1, 1, 1, 1))
