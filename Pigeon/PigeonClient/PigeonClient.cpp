@@ -105,7 +105,7 @@ PigeonPacket PigeonClient::DeserializePacket(std::vector<unsigned char>& packet)
 
     int offset = 0;
 
-    String::printBytesInHex(packet);
+    //String::printBytesInHex(packet);
     std::memcpy(&packetRet.HEADER.HEADER_LENGTH, &packet[offset], sizeof(int));
     offset += sizeof(int);
 
@@ -171,6 +171,7 @@ void* PigeonClient::ProcessPacket()
 
     std::string servername = "";
     servername = value["ServerName"].asString();
+    PigeonClientGUIInfo::MOTD = value["MOTD"].asString();
 
     if (servername.empty()) {
         //server didnt send servername (it wont happen)
@@ -262,7 +263,7 @@ void* PigeonClient::ProcessPacket()
             auto buf = String::StringToBytes(B64::base64_decode(content));
 
             //new file to download, update UI
-            File::BufferToDisk(buf, "Files/" + filename);
+            std::cout << File::BufferToDisk(buf, PigeonClientGUIInfo::donwloadPath + '/' + filename + '.' + ext) << std::endl;
             break;
 
         }            
@@ -297,7 +298,7 @@ void PigeonClient::ChangeStatus(const std::string& status)
 
     PigeonPacket pkg = BuildPacket(PIGEON_OPCODE::PRESENCE_UPDATE, m_username, String::StringToBytes(m));
     
-    String::printBytesInHex(SerializePacket(pkg));
+    //String::printBytesInHex(SerializePacket(pkg));
     
     SendPacket(pkg);
 }

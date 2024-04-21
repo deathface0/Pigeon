@@ -75,6 +75,9 @@ namespace PigeonClientGUIInfo
 	inline std::string msg = "";
 
 	inline std::map<std::string, std::string> Users;
+
+	inline std::string donwloadPath = "";
+	inline std::string MOTD = "";
 }
 
 namespace Texture {

@@ -114,6 +114,7 @@ namespace PigeonClientGUI
 		{
 			static int numFiles = 0;
 			std::string label = "File" + std::to_string(numFiles++);
+			std::string file = filename + ext;
 
 			ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, 100), true);
 
@@ -122,7 +123,32 @@ namespace PigeonClientGUI
 				ImGui::SetCursorPosX(10); ImGui::Text("%s:", username);
 				ImGui::Dummy(ImVec2(0.0f, 10.0f)); ImGui::SetCursorPosX(7); GUIUtils::Image(label, Texture::file, 40, 40);
 				ImGui::SameLine();
-				ImGui::Text("%s%s", filename, ext);
+
+				ImVec2 textPos = ImGui::GetCursorScreenPos();
+				ImVec2 textSize = ImGui::CalcTextSize(file.c_str());
+
+				if (ImGui::IsMouseHoveringRect(textPos, { textPos.x + textSize.x, textPos.y + + textSize.y }))
+				{
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
+					ImGui::Text("%s", file.c_str());
+					ImGui::PopStyleColor();
+
+					if (ImGui::IsMouseClicked(0))
+					{
+						donwloadPath = File::SelectDirectory();
+						std::replace_if(donwloadPath.begin(), donwloadPath.end(), [](char c) { return c == '\\'; }, '/');
+
+						std::string json = R"({"filename":")" + filename + R"("})";
+						PigeonPacket pkt = client->BuildPacket(MEDIA_DOWNLOAD, Username, std::vector<unsigned char>(json.begin(), json.end()));
+						client->SendPacket(pkt);
+					}
+				}
+				else
+				{
+					std::cout << "File: " << file << std::endl;
+					ImGui::Text("%s", file.c_str());
+				}
+				
 			}
 			else {
 				//RENDER IMAGE
@@ -148,7 +174,6 @@ namespace PigeonClientGUI
 
 					if (pos != std::string::npos) {
 						ext = msg.content.substr(pos + 1);
-						std::cout << "Extensión de archivo: " << ext << std::endl;
 
 						if (!ext.empty()) {
 							ext = '.' + ext;
@@ -241,16 +266,27 @@ namespace PigeonClientGUI
 
 			ImGui::BeginChild("Chat Info", ImVec2(windowWidth - 220, 50), true);
 			
-			ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(0.525, 0.502, 0.89, 1.00f);
+			int TextSize = 0;
+
 			ImGui::SetCursorPosY(10);
 			ImGui::SetCursorPosX(infoPos);
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.525, 0.502, 0.89, 1.00f));
 			ImGui::Text("Connected to \"%s\"", client->GetServername().c_str());
+			TextSize += ImGui::GetItemRectSize().x;
+			ImGui::PopStyleColor();
+			ImGui::SameLine();
+			ImGui::Text(" - ");
+			ImGui::SameLine();
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.89, 0.878, 0.129, 1.00f));
+			ImGui::Text("\"%s\"", MOTD.c_str());
+			TextSize += ImGui::GetItemRectSize().x;
+			ImGui::PopStyleColor();
+
 			infoPos++;
 			if (infoPos >= windowWidth - 220)
-				infoPos = -ImGui::GetItemRectSize().x;
+				infoPos = -TextSize;
 			
 			ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-			//std::cout << ImGui::GetItemRectSize().x << std::endl;
 
 			ImGui::EndChild();
 

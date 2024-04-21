@@ -24,6 +24,9 @@
 
 #include "stb_image/stb_image.h"
 
+#include <Windows.h>
+#include <ShlObj.h>
+
 #endif
 
 
@@ -35,6 +38,8 @@
 #include <iomanip>
 #include <random>
 #include <sstream>
+#include <tchar.h>
+
 
 namespace File {
     static bool BufferToDisk(const std::vector<unsigned char>& buffer, const std::string& filename) {
@@ -111,6 +116,35 @@ namespace File {
             std::string filePath(size_needed, 0);
             WideCharToMultiByte(CP_UTF8, 0, szFileName, -1, &filePath[0], size_needed, NULL, NULL);
             return filePath;
+        }
+        return "";
+    }
+
+    static std::string SelectDirectory() {
+        BROWSEINFO browseInfo;
+        ZeroMemory(&browseInfo, sizeof(BROWSEINFO));
+
+        TCHAR szDir[MAX_PATH];
+        ZeroMemory(szDir, sizeof(szDir));
+
+        browseInfo.hwndOwner = NULL; // Ventana principal (o NULL si no es relevante)
+        browseInfo.pidlRoot = NULL;
+        browseInfo.pszDisplayName = szDir; // Almacena la ruta del directorio seleccionado
+        browseInfo.lpszTitle = _T("Seleccione un directorio");
+        browseInfo.ulFlags = BIF_RETURNONLYFSDIRS;
+
+        // Abre el cuadro de diálogo de selección de directorios
+        LPITEMIDLIST pidl = SHBrowseForFolder(&browseInfo);
+        if (pidl != NULL) {
+            // Obtiene la ruta del directorio seleccionado
+            if (SHGetPathFromIDList(pidl, szDir) == TRUE) {
+                // Convierte TCHAR a std::string
+                std::wstring ws(szDir);
+                std::string directory(ws.begin(), ws.end());
+                return directory;
+            }
+            // Liberar memoria
+            CoTaskMemFree(pidl);
         }
         return "";
     }
