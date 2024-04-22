@@ -188,6 +188,28 @@ namespace PigeonClientGUI
 			}
 		}
 
+		void uploadFile()
+		{
+			std::string filepath = File::selectFile();
+
+			size_t lastSlashPos = filepath.find_last_of('/');
+			std::string filenameWithExt = filepath.substr(lastSlashPos + 1);
+
+			size_t lastDotPos = filenameWithExt.find_last_of('.');
+			std::string filename = filenameWithExt.substr(0, lastDotPos);
+			std::string extension = (lastDotPos != std::string::npos) ? filenameWithExt.substr(lastDotPos + 1) : "";
+			extension.erase(std::remove(extension.begin(), extension.end(), '\0'), extension.end());
+
+			if (!filepath.empty())
+			{
+				std::string encoded_file = B64::base64_encode(String::BytesToString(File::DiskToBuffer(filepath)));
+
+				std::string json = R"({"content":")" + encoded_file + R"(", "ext":")" + extension + R"(", "filename":")" + filename + R"("})";
+				PigeonPacket pkt = client->BuildPacket(MEDIA_FILE, Username, std::vector<unsigned char>(json.begin(), json.end()));
+				client->SendPacket(pkt);
+			}
+		}
+
 		void LeftMenu() {
 			ImGui::PushFont(Font::OpenSans::px30);
 
@@ -316,24 +338,8 @@ namespace PigeonClientGUI
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("Upload", Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 #ifdef _WIN32
-				std::string filepath = File::selectFile();
-
-				size_t lastSlashPos = filepath.find_last_of('/');
-				std::string filenameWithExt = filepath.substr(lastSlashPos + 1);
-
-				size_t lastDotPos = filenameWithExt.find_last_of('.');
-				std::string filename = filenameWithExt.substr(0, lastDotPos);
-				std::string extension = (lastDotPos != std::string::npos) ? filenameWithExt.substr(lastDotPos + 1) : "";
-				extension.erase(std::remove(extension.begin(), extension.end(), '\0'), extension.end());
-
-				if (!filepath.empty())
-				{
-					std::string encoded_file = B64::base64_encode(String::BytesToString(File::DiskToBuffer(filepath)));
-					
-					std::string json = R"({"content":")" + encoded_file + R"(", "ext":")" + extension + R"(", "filename":")" + filename + R"("})";
-					PigeonPacket pkt = client->BuildPacket(MEDIA_FILE, Username, std::vector<unsigned char>(json.begin(), json.end()));
-					client->SendPacket(pkt);
-				}
+				std::thread uploadFileThread(uploadFile);
+				uploadFileThread.detach();
 #endif
 			}
 			ImGui::SameLine();
@@ -379,9 +385,13 @@ namespace PigeonClientGUI
 			if (GUIUtils::ImageButton("##SelectDownloadPath", Texture::folder, ImVec2(30, 30)))
 			{
 #ifdef WIN32
-				std::string path = File::SelectDirectory();
-				if (!path.empty())
-					donwloadPath = path;
+				std::thread donwloadPath([&]()
+					{
+						std::string path = File::SelectDirectory();
+						if (!path.empty())
+							donwloadPath = path;
+					});
+				donwloadPath.detach();
 #endif
 			}
 			ImGui::SameLine(); ImGui::Dummy(ImVec2(10, 0)); ImGui::SameLine();
