@@ -135,9 +135,6 @@ namespace PigeonClientGUI
 
 					if (ImGui::IsMouseClicked(0))
 					{
-						donwloadPath = File::SelectDirectory();
-						std::replace_if(donwloadPath.begin(), donwloadPath.end(), [](char c) { return c == '\\'; }, '/');
-
 						std::string json = R"({"filename":")" + filename + R"("})";
 						PigeonPacket pkt = client->BuildPacket(MEDIA_DOWNLOAD, Username, std::vector<unsigned char>(json.begin(), json.end()));
 						client->SendPacket(pkt);
@@ -145,7 +142,6 @@ namespace PigeonClientGUI
 				}
 				else
 				{
-					std::cout << "File: " << file << std::endl;
 					ImGui::Text("%s", file.c_str());
 				}
 				
@@ -321,7 +317,7 @@ namespace PigeonClientGUI
 #ifdef _WIN32
 				std::string filepath = File::selectFile();
 
-				size_t lastSlashPos = filepath.find_last_of('\\');
+				size_t lastSlashPos = filepath.find_last_of('/');
 				std::string filenameWithExt = filepath.substr(lastSlashPos + 1);
 
 				size_t lastDotPos = filenameWithExt.find_last_of('.');
@@ -356,7 +352,6 @@ namespace PigeonClientGUI
 
 		void ChatPage()
 		{
-			//ImGui::ShowDemoWindow();
 			LeftMenu();
 			ImGui::SameLine();
 			RightMenu();
@@ -367,7 +362,23 @@ namespace PigeonClientGUI
 	{
 		void SettingsPage()
 		{
-			ImGui::Text("Settings");
+			ImGui::PushFont(Font::OpenSans::px30);
+
+			ImGui::SetCursorPos(ImVec2(windowWidth - 80, 13));
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 300);
+			if (GUIUtils::ImageButton("##ReturnToChat", Texture::close, ImVec2(40, 40)))
+				settings = false;
+			ImGui::PopStyleVar();
+
+			static int settingPosY = 80;
+			ImGui::SetCursorPos(ImVec2(20, settingPosY));
+			ImGui::PushItemWidth(600);
+			ImGui::InputText("##DownloadPath", &donwloadPath);
+			ImGui::SameLine();
+			if (GUIUtils::ImageButton("##SelectDownloadPath", Texture::folder, ImVec2(30, 30)))
+				donwloadPath = File::SelectDirectory();
+			ImGui::SameLine(); ImGui::Dummy(ImVec2(10, 0)); ImGui::SameLine();
+			ImGui::Text("Download path");
 		}
 	}
 

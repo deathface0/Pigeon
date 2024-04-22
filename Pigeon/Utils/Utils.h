@@ -94,7 +94,7 @@ namespace File {
     static unsigned char* loadImage(const char* filename, int* width, int* height, int* channels) {
         return stbi_load(filename, width, height, channels, STBI_rgb_alpha);
     }
-
+#ifdef WIN32
     static std::string selectFile()
     {
         OPENFILENAMEW ofn;
@@ -115,6 +115,9 @@ namespace File {
             int size_needed = WideCharToMultiByte(CP_UTF8, 0, szFileName, -1, NULL, 0, NULL, NULL);
             std::string filePath(size_needed, 0);
             WideCharToMultiByte(CP_UTF8, 0, szFileName, -1, &filePath[0], size_needed, NULL, NULL);
+
+            std::replace_if(filePath.begin(), filePath.end(), [](char c) { return c == '\\'; }, '/');
+
             return filePath;
         }
         return "";
@@ -141,6 +144,9 @@ namespace File {
                 // Convierte TCHAR a std::string
                 std::wstring ws(szDir);
                 std::string directory(ws.begin(), ws.end());
+
+                std::replace_if(directory.begin(), directory.end(), [](char c) { return c == '\\'; }, '/');
+
                 return directory;
             }
             // Liberar memoria
@@ -148,6 +154,21 @@ namespace File {
         }
         return "";
     }
+
+    static std::string getHomeDirectory() {
+        WCHAR wszPath[MAX_PATH];
+        if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, wszPath))) {
+            char szPath[MAX_PATH];
+            WideCharToMultiByte(CP_UTF8, 0, wszPath, -1, szPath, MAX_PATH, NULL, NULL);
+
+            std::string path(szPath);
+            std::replace_if(path.begin(), path.end(), [](char c) { return c == '\\'; }, '/');
+
+            return std::string(path);
+        }
+        return "";
+    }
+#endif
 }
 
 namespace String {

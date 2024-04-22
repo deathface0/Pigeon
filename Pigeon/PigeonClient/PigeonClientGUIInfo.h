@@ -3,7 +3,6 @@
 #include <unordered_map>
 #include <queue>
 
-
 //UBUNTU
 #ifdef __linux__
 
@@ -86,6 +85,8 @@ namespace Texture {
 	inline GLuint upload, settings, disconnect;
 	inline GLuint online, idle, dnd, error;
 	inline GLuint file;
+	inline GLuint close;
+	inline GLuint folder;
 }
 
 namespace Font {
