@@ -373,23 +373,25 @@ namespace PigeonClientGUI
 				settings = false;
 			ImGui::PopStyleVar();
 
-			static int settingPosY = 80;
-			ImGui::SetCursorPos(ImVec2(20, settingPosY));
+			ImGui::SetCursorPos(ImVec2(20,80));
+			ImGui::BeginChild("##DownloadPath", ImVec2(windowWidth - 100, 40), true);
 			ImGui::PushItemWidth(600);
 			ImGui::InputText("##DownloadPath", &donwloadPath);
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("##SelectDownloadPath", Texture::folder, ImVec2(30, 30)))
 			{
+#ifdef WIN32
 				std::thread selectFile([&]() { 
 					std::string path = File::SelectDirectory();
 					if (!path.empty())
 						donwloadPath = path;
 					});
 				selectFile.detach();
+#endif
 			}
-
 			ImGui::SameLine(); ImGui::Dummy(ImVec2(10, 0)); ImGui::SameLine();
 			ImGui::Text("Download path");
+			ImGui::EndChild();
 		}
 	}
 
