@@ -15,7 +15,6 @@
 
 #include <GL/glew.h>
 
-#include "PigeonClient/PigeonClient.h"
 
 //MSVC
 #else
@@ -38,6 +37,7 @@
 #include <map>
 #include <thread>
 #include <future>
+#include <algorithm>
 
 using namespace PigeonClientGUIInfo;
 
@@ -56,15 +56,16 @@ namespace PigeonClientGUI
 		void WelcomePage()
 		{
 			//Title
-			ImGui::PushFont(Font::MadimiOne::px50);
+			//ImGui::PushFont(Font::MadimiOne::px50);
 			GUIUtils::TextCentered("Welcome to Pigeon");
 
 			//Logo
 			GUIUtils::ImageCentered("Logo", Texture::welcome, 250, 250);
 
+
 			//Form
 			ImGui::NewLine();
-			ImGui::PushFont(Font::MadimiOne::px20);
+			//ImGui::PushFont(Font::MadimiOne::px20);
 			GUIUtils::TextCentered("Server Address");
 			GUIUtils::InputCentered("##addressField", Address, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
 
@@ -86,7 +87,7 @@ namespace PigeonClientGUI
 					return;
 				}
 
-				Address = "192.168.100.10";
+				Address = "127.0.0.1";
 				Port = "4444";
 				
 				/*Username = "Ahuesag";*/
@@ -133,13 +134,14 @@ namespace PigeonClientGUI
 
 				if (ImGui::IsMouseHoveringRect(textPos, { textPos.x + textSize.x, textPos.y + + textSize.y }))
 				{
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
+					//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
 					ImGui::Text("%s", file.c_str());
-					ImGui::PopStyleColor();
+					//ImGui::PopStyleColor();
 
 					if (ImGui::IsMouseClicked(0))
 					{
 						std::string json = R"({"filename":")" + filename + R"("})";
+						std::cout << json << std::endl;
 						PigeonPacket pkt = client->BuildPacket(MEDIA_DOWNLOAD, Username, std::vector<unsigned char>(json.begin(), json.end()));
 						client->SendPacket(pkt);
 					}
@@ -193,7 +195,19 @@ namespace PigeonClientGUI
 
 		void uploadFile()
 		{
+#ifdef _WIN32
 			std::string filepath = File::selectFile();
+#else
+			char filepath_cstr[1024];
+
+			FILE* file = popen("zenity --file-selection", "r");
+
+			fgets(filepath_cstr,1024,file);
+
+			std::string filepath(filepath_cstr);
+			filepath.pop_back();
+
+#endif
 
 			size_t lastSlashPos = filepath.find_last_of('/');
 			std::string filenameWithExt = filepath.substr(lastSlashPos + 1);
@@ -213,8 +227,10 @@ namespace PigeonClientGUI
 			}
 		}
 
+
+
 		void LeftMenu() {
-			ImGui::PushFont(Font::OpenSans::px30);
+			//ImGui::PushFont(Font::OpenSans::px30);
 
 			ImGui::BeginChild("Left Menu", ImVec2(220, windowHeight), true);
 
@@ -292,17 +308,17 @@ namespace PigeonClientGUI
 
 			ImGui::SetCursorPosY(10);
 			ImGui::SetCursorPosX(infoPos);
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.525, 0.502, 0.89, 1.00f));
+			//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.525, 0.502, 0.89, 1.00f));
 			ImGui::Text("Connected to \"%s\"", client->GetServername().c_str());
 			TextSize += ImGui::GetItemRectSize().x;
-			ImGui::PopStyleColor();
+			//ImGui::PopStyleColor();
 			ImGui::SameLine();
 			ImGui::Text(" - ");
 			ImGui::SameLine();
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.89, 0.878, 0.129, 1.00f));
+			//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.89, 0.878, 0.129, 1.00f));
 			ImGui::Text("\"%s\"", MOTD.c_str());
 			TextSize += ImGui::GetItemRectSize().x;
-			ImGui::PopStyleColor();
+			//ImGui::PopStyleColor();
 
 			infoPos++;
 			if (infoPos >= windowWidth - 220)
@@ -326,7 +342,8 @@ namespace PigeonClientGUI
 				ImGui::SetKeyboardFocusHere(0); //Maintain input text always selected
 				focusMSG = false;
 			}
-			ImGui::PushFont(Font::OpenSans::px40);
+			//ImGui::PushFont(Font::OpenSans::px40);
+
 			ImGui::PushItemWidth(windowWidth - 370);
 			ImGui::InputText("##MSG", &msg);
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
@@ -340,9 +357,7 @@ namespace PigeonClientGUI
 			}
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("Upload", Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
-#ifdef _WIN32
 				s_filepathFuture = std::async(std::launch::async, [&] {uploadFile(); return std::string(); });
-#endif
 			}
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("Settings", Texture::settings, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
@@ -371,7 +386,7 @@ namespace PigeonClientGUI
 	{
 		void SettingsPage()
 		{
-			ImGui::PushFont(Font::OpenSans::px30);
+			//ImGui::PushFont(Font::OpenSans::px30);
 
 			ImGui::SetCursorPos(ImVec2(windowWidth - 80, 13));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 300);
@@ -386,15 +401,26 @@ namespace PigeonClientGUI
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("##SelectDownloadPath", Texture::folder, ImVec2(30, 30)))
 			{
-#ifdef WIN32
-				std::thread donwloadPath([&]()
+
+				std::thread donwloadPathT([&]()
 					{
+#ifdef WIN32
 						std::string path = File::SelectDirectory();
+#else
+						char filepath_cstr[1024];
+
+						FILE* file = popen("zenity  --file-selection --directory", "r");
+
+						fgets(filepath_cstr,1024,file);
+
+						std::string path(filepath_cstr);
+						path.pop_back();
+#endif
+
 						if (!path.empty())
 							donwloadPath = path;
 					});
-				donwloadPath.detach();
-#endif
+				donwloadPathT.detach();
 			}
 			ImGui::SameLine(); ImGui::Dummy(ImVec2(10, 0)); ImGui::SameLine();
 			ImGui::Text("Download path");
@@ -424,6 +450,7 @@ namespace PigeonClientGUI
     }
 
 	void SetUpStyle() {
+		
 		ImVec4* colors = ImGui::GetStyle().Colors;
 		colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 		colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
@@ -506,7 +533,9 @@ namespace PigeonClientGUI
 		style.GrabRounding = 3;
 		style.LogSliderDeadzone = 4;
 		style.TabRounding = 4;
-		style.ScaleAllSizes(2.5);
+		
+		//style.ScaleAllSizes(1);
+
 		ImGui::GetStyle().WindowRounding = 0.0f;
 		ImGui::GetStyle().ChildRounding = 0.0f;
 		ImGui::GetStyle().FrameRounding = 0.0f;
@@ -514,6 +543,7 @@ namespace PigeonClientGUI
 		ImGui::GetStyle().PopupRounding = 0.0f;
 		ImGui::GetStyle().ScrollbarRounding = 0.0f;
 		ImGui::GetStyle().FrameRounding = 100.f;
+		
 	}
 
 	void SetChatStyle()
@@ -522,9 +552,9 @@ namespace PigeonClientGUI
 		ImGui::GetStyle().FrameRounding = 0.f;
 		ImGui::GetStyle().ItemSpacing = ImVec2(0.00f, 0.00f);
 
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 1.f));
+	//ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+		//ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+		//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 1.f));
 	}
 
     void SetUpImGui() {

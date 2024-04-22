@@ -38,7 +38,7 @@ enum MSG_TYPE
 	PIGEON_FILE
 };
 
-static struct GUI_MSG
+struct GUI_MSG
 {
 	MSG_TYPE type;
 	std::string username;
