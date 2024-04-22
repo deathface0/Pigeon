@@ -316,9 +316,7 @@ namespace PigeonClientGUI
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("Upload", Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 #ifdef _WIN32
-				std::string filepath;
-				std::thread selectFile([&]() { filepath = File::selectFile(); });
-				selectFile.detach();
+				std::string filepath = File::selectFile();
 
 				size_t lastSlashPos = filepath.find_last_of('/');
 				std::string filenameWithExt = filepath.substr(lastSlashPos + 1);
@@ -381,12 +379,9 @@ namespace PigeonClientGUI
 			if (GUIUtils::ImageButton("##SelectDownloadPath", Texture::folder, ImVec2(30, 30)))
 			{
 #ifdef WIN32
-				std::thread selectFile([&]() { 
-					std::string path = File::SelectDirectory();
-					if (!path.empty())
-						donwloadPath = path;
-					});
-				selectFile.detach();
+				std::string path = File::SelectDirectory();
+				if (!path.empty())
+					donwloadPath = path;
 #endif
 			}
 			ImGui::SameLine(); ImGui::Dummy(ImVec2(10, 0)); ImGui::SameLine();
