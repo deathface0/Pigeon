@@ -37,6 +37,7 @@
 #include <vector>
 #include <map>
 #include <thread>
+#include <future>
 
 using namespace PigeonClientGUIInfo;
 
@@ -47,6 +48,8 @@ namespace PigeonClientGUI
     SDL_Window* sdlWindow = nullptr;
     SDL_GLContext glContext = NULL;
     SDL_Event currentEvent;
+
+	static std::future<std::string> s_filepathFuture;
 
 	namespace Welcome
 	{
@@ -83,7 +86,7 @@ namespace PigeonClientGUI
 					return;
 				}
 
-				Address = "192.168.1.135";
+				Address = "192.168.100.10";
 				Port = "4444";
 				
 				/*Username = "Ahuesag";*/
@@ -338,8 +341,7 @@ namespace PigeonClientGUI
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("Upload", Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 #ifdef _WIN32
-				std::thread uploadFileThread(uploadFile);
-				uploadFileThread.detach();
+				s_filepathFuture = std::async(std::launch::async, [&] {uploadFile(); return std::string(); });
 #endif
 			}
 			ImGui::SameLine();
