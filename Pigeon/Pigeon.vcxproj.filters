@@ -25,6 +25,9 @@
     <Filter Include="Header Files\imgui">
       <UniqueIdentifier>{0267820a-5a5a-4f7c-a84b-dcf943aad709}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\SoundPlayer">
+      <UniqueIdentifier>{8e2bae5a-36c6-4b26-afce-662f964875a4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MediaPlayer\MediaPlayer.cpp">
@@ -68,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="..\Dependencies\include\imgui\imgui_stdlib.cpp">
       <Filter>Header Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundPlayer\SoundPlayer.cpp">
+      <Filter>Header Files\SoundPlayer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="PigeonClient\PigeonClientGUIInfo.h">
       <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundPlayer\SoundPlayer.h">
+      <Filter>Header Files\SoundPlayer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

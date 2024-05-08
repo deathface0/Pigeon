@@ -20,6 +20,7 @@
 #include "PigeonClientGUIInfo.h"
 #include "PigeonPacket.h"
 #include "../Utils/Utils.h"
+#include "../SoundPlayer/SoundPlayer.h"
 
 class PigeonClient {
 public:
@@ -52,6 +53,8 @@ private:
 	bool m_connected = false;
 
 	std::vector<std::string> filePaths;
+
+	//SoundPlayer m_soundPlayer;
 
 	int Connect();
 	PigeonPacket Handshake();

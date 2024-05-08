@@ -223,6 +223,9 @@ void* PigeonClient::ProcessPacket()
             cmsg = std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end());
             //PigeonClientGUIInfo::msgBuffer.appendf("%s\n", cmsg.c_str());
             PigeonClientGUIInfo::msgBuffer.push_back({ MSG_TYPE::PIGEON_TEXT, pkt.HEADER.username, cmsg });
+
+            //std::thread([&]() {m_soundPlayer.play(PigeonClientGUIInfo::msgAudioPath); }).detach();
+
             std::cout << pkt.HEADER.username << ": " << std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end()) << std::endl;
             break;
 

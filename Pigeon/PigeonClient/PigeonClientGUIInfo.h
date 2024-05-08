@@ -77,6 +77,7 @@ namespace PigeonClientGUIInfo
 
 	inline std::string donwloadPath = "";
 	inline std::string MOTD = "";
+	inline std::string msgAudioPath = "Sounds/discord-notification.wav";
 }
 
 namespace Texture {

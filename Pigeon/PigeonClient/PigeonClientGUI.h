@@ -49,8 +49,6 @@ namespace PigeonClientGUI
     SDL_GLContext glContext = NULL;
     SDL_Event currentEvent;
 
-	static std::future<std::string> s_filepathFuture;
-
 	namespace Welcome
 	{
 		void WelcomePage()
@@ -77,8 +75,8 @@ namespace PigeonClientGUI
 			ImGui::NewLine();
 			if (GUIUtils::ButtonCentered("Connect", 200, 50) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
 			{
-				/*if (Address.empty() || Port.empty() || Username.empty())
-					return;*/
+				if (Address.empty() || Port.empty() || Username.empty())
+					return;
 
 				if (Username.size() > MAX_USERNAME)
 				{
@@ -86,8 +84,8 @@ namespace PigeonClientGUI
 					return;
 				}
 
-				Address = "192.168.100.10";
-				Port = "4444";
+				/*Address = "192.168.1.135";
+				Port = "4444";*/
 				
 				/*Username = "Ahuesag";*/
 
@@ -99,6 +97,8 @@ namespace PigeonClientGUI
 
 	namespace Chat
 	{
+		inline std::future<void> s_filepathFuture;
+
 		GLuint& getStatusImage(int status)
 		{
 			switch (status)
@@ -341,7 +341,7 @@ namespace PigeonClientGUI
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("Upload", Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 #ifdef _WIN32
-				s_filepathFuture = std::async(std::launch::async, [&] {uploadFile(); return std::string(); });
+				s_filepathFuture = std::async(std::launch::async, [&](){uploadFile(); });
 #endif
 			}
 			ImGui::SameLine();
@@ -369,6 +369,8 @@ namespace PigeonClientGUI
 
 	namespace Settings
 	{
+		inline std::future<void> s_directoryFuture;
+
 		void SettingsPage()
 		{
 			ImGui::PushFont(Font::OpenSans::px30);
@@ -387,13 +389,12 @@ namespace PigeonClientGUI
 			if (GUIUtils::ImageButton("##SelectDownloadPath", Texture::folder, ImVec2(30, 30)))
 			{
 #ifdef WIN32
-				std::thread donwloadPath([&]()
+				std::thread([&]()
 					{
 						std::string path = File::SelectDirectory();
 						if (!path.empty())
 							donwloadPath = path;
-					});
-				donwloadPath.detach();
+					}).detach();
 #endif
 			}
 			ImGui::SameLine(); ImGui::Dummy(ImVec2(10, 0)); ImGui::SameLine();
