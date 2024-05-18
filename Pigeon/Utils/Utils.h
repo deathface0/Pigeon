@@ -12,6 +12,10 @@
 
 #include <GL/glew.h>
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+
 //MSVC
 #else
 
@@ -99,6 +103,7 @@ namespace File {
     static unsigned char* loadImage(const char* filename, int* width, int* height, int* channels) {
         return stbi_load(filename, width, height, channels, STBI_rgb_alpha);
     }
+
 #ifdef WIN32
     static std::string selectFile()
     {
@@ -128,7 +133,7 @@ namespace File {
         return "";
     }
 
-    static std::string SelectDirectory() {
+    static std::string selectDirectory() {
         BROWSEINFO browseInfo;
         ZeroMemory(&browseInfo, sizeof(BROWSEINFO));
 
@@ -170,6 +175,44 @@ namespace File {
             std::replace_if(path.begin(), path.end(), [](char c) { return c == '\\'; }, '/');
 
             return std::string(path);
+        }
+        return "";
+    }
+#endif
+
+#ifdef __linux__
+    static std::string selectDirectory()
+    {
+        char filepath_cstr[1024];
+
+        FILE* file = popen("zenity  --file-selection --directory", "r");
+
+        fgets(filepath_cstr, 1024, file);
+
+        std::string path(filepath_cstr);
+        path.pop_back();
+
+        return path;
+    }
+
+    static std::string selectFile()
+    {
+        char filepath_cstr[1024];
+
+        FILE* file = popen("zenity --file-selection", "r");
+
+        fgets(filepath_cstr, 1024, file);
+
+        std::string filepath(filepath_cstr);
+        filepath.pop_back();
+
+        return filepath;
+    }
+
+    static std::string getHomeDirectory() {
+        struct passwd* pw = getpwuid(getuid());
+        if (pw != NULL) {
+            return std::string(pw->pw_dir);
         }
         return "";
     }

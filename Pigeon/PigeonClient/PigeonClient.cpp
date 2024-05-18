@@ -222,7 +222,7 @@ void* PigeonClient::ProcessPacket()
             //send message to GUI...
             cmsg = std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end());
             //PigeonClientGUIInfo::msgBuffer.appendf("%s\n", cmsg.c_str());
-            PigeonClientGUIInfo::msgBuffer.push_back({ MSG_TYPE::PIGEON_TEXT, pkt.HEADER.username, cmsg });
+            PigeonClientGUIInfo::msgBuffer.push_back({ MSG_TYPE::PIGEON_TEXT, pkt.HEADER.TIME_STAMP , pkt.HEADER.username, cmsg });
 
             //std::thread([&]() {m_soundPlayer.play(PigeonClientGUIInfo::msgAudioPath); }).detach();
 
@@ -243,7 +243,7 @@ void* PigeonClient::ProcessPacket()
                 break;
             }
 
-            PigeonClientGUIInfo::msgBuffer.push_back({ MSG_TYPE::PIGEON_FILE, pkt.HEADER.username, filename });
+            PigeonClientGUIInfo::msgBuffer.push_back({ MSG_TYPE::PIGEON_FILE, pkt.HEADER.TIME_STAMP, pkt.HEADER.username, filename });
 
             std::cout << "New media file by: " << pkt.HEADER.username << " Filename: " << filename << std::endl;
             filePaths.push_back(filename);

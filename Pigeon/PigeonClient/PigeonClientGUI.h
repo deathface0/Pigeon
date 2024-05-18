@@ -28,8 +28,8 @@
 #include <GLEW/GL/glew.h>
 #include "Utils/Utils.h"
 
-
 #endif
+
 #include <iostream>
 #include <chrono>
 #include <ctime>
@@ -119,7 +119,7 @@ namespace PigeonClientGUI
 			}
 		}
 
-		void renderFileUpload(std::string username, std::string filename, std::string ext)
+		void renderFileUpload(time_t timestamp, std::string username, std::string filename, std::string ext)
 		{
 			static int numFiles = 0;
 			std::string label = "File" + std::to_string(numFiles++);
@@ -129,7 +129,7 @@ namespace PigeonClientGUI
 
 			if (ext != ".png" && ext != ".jpg" && ext != ".jpeg")
 			{
-				ImGui::SetCursorPosX(10); ImGui::Text("%s:", username.c_str());
+				ImGui::SetCursorPosX(10); ImGui::Text("%i - %s:", timestamp, username.c_str());
 				ImGui::Dummy(ImVec2(0.0f, 10.0f)); ImGui::SetCursorPosX(7); GUIUtils::Image(label, Texture::file, 40, 40);
 				ImGui::SameLine();
 
@@ -144,7 +144,7 @@ namespace PigeonClientGUI
 
 					if (ImGui::IsMouseClicked(0))
 					{
-						std::string json = R"({"filename":")" + filename + R"("})";
+						std::string json = R"({"filename":")" + std::to_string(timestamp) + '_' + filename + R"("})";
 						std::cout << json << std::endl;
 						PigeonPacket pkt = client->BuildPacket(MEDIA_DOWNLOAD, Username, std::vector<unsigned char>(json.begin(), json.end()));
 						client->SendPacket(pkt);
@@ -170,7 +170,7 @@ namespace PigeonClientGUI
 				switch (msg.type) {
 				case MSG_TYPE::PIGEON_TEXT:
 					ImGui::SetCursorPosX(10);
-					ImGui::Text("%s: %s", msg.username.c_str(), msg.content.c_str());
+					ImGui::Text("%i - %s: %s", msg.timestamp, msg.username.c_str(), msg.content.c_str());
 					ImGui::Separator();
 					break;
 				case MSG_TYPE::PIGEON_FILE:
@@ -190,7 +190,7 @@ namespace PigeonClientGUI
 					std::transform(ext.begin(), ext.end(), ext.begin(),
 						[](unsigned char c) { return std::tolower(c); });
 
-					renderFileUpload(msg.username, filename, ext);
+					renderFileUpload(msg.timestamp, msg.username, filename, ext);
 					ImGui::Separator();
 					break;
 				}
@@ -199,19 +199,7 @@ namespace PigeonClientGUI
 
 		void uploadFile()
 		{
-#ifdef _WIN32
 			std::string filepath = File::selectFile();
-#else
-			char filepath_cstr[1024];
-
-			FILE* file = popen("zenity --file-selection", "r");
-
-			fgets(filepath_cstr, 1024, file);
-
-			std::string filepath(filepath_cstr);
-			filepath.pop_back();
-
-#endif
 
 			size_t lastSlashPos = filepath.find_last_of('/');
 			std::string filenameWithExt = filepath.substr(lastSlashPos + 1);
@@ -418,26 +406,12 @@ namespace PigeonClientGUI
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("##SelectDownloadPath", Texture::folder, ImVec2(30, 30)))
 			{
-
-				std::thread donwloadPathT([&]()
-					{
-#ifdef WIN32
-						std::string path = File::SelectDirectory();
-#else
-						char filepath_cstr[1024];
-
-						FILE* file = popen("zenity  --file-selection --directory", "r");
-
-						fgets(filepath_cstr, 1024, file);
-
-						std::string path(filepath_cstr);
-						path.pop_back();
-#endif
-
-						if (!path.empty())
-							donwloadPath = path;
-					});
-				donwloadPathT.detach();
+				std::thread([&]()
+				{
+					std::string path = File::selectDirectory();
+					if (!path.empty())
+						donwloadPath = path;
+				}).detach();
 			}
 			ImGui::SameLine(); ImGui::Dummy(ImVec2(10, 0)); ImGui::SameLine();
 			ImGui::Text("Download path");
