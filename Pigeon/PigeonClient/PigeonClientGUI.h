@@ -129,7 +129,7 @@ namespace PigeonClientGUI
 
 			if (ext != ".png" && ext != ".jpg" && ext != ".jpeg")
 			{
-				ImGui::SetCursorPosX(10); ImGui::Text("%i - %s:", timestamp, username.c_str());
+				ImGui::SetCursorPosX(10); ImGui::Text("%s - %s:", Time::timestampToDateTime(timestamp, "%Y-%m-%d %H:%M:%S").c_str(), username.c_str());
 				ImGui::Dummy(ImVec2(0.0f, 10.0f)); ImGui::SetCursorPosX(7); GUIUtils::Image(label, Texture::file, 40, 40);
 				ImGui::SameLine();
 
@@ -170,7 +170,7 @@ namespace PigeonClientGUI
 				switch (msg.type) {
 				case MSG_TYPE::PIGEON_TEXT:
 					ImGui::SetCursorPosX(10);
-					ImGui::Text("%i - %s: %s", msg.timestamp, msg.username.c_str(), msg.content.c_str());
+					ImGui::Text("%s - %s: %s", Time::timestampToDateTime(msg.timestamp, "%Y-%m-%d %H:%M:%S").c_str(), msg.username.c_str(), msg.content.c_str());
 					ImGui::Separator();
 					break;
 				case MSG_TYPE::PIGEON_FILE:
@@ -364,6 +364,8 @@ namespace PigeonClientGUI
 			if (GUIUtils::ImageButton("Disconnect", Texture::disconnect, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::PRESENCE_UPDATE, Username, String::StringToBytes("DISCONNECT"));
 				client->SendPacket(pkg);
+
+				msgBuffer.clear();
 			}
 
 			ImGui::PopFont();

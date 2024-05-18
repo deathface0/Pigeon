@@ -236,14 +236,21 @@ namespace String {
   
 }
 
-namespace Random {
-    static size_t genRandom(size_t min, size_t max) {
-        std::random_device rd;
-        std::mt19937 gen(rd());
+namespace Time {
+    //"%Y-%m-%d %H:%M:%S" (24h)  /  "%Y-%m-%d %I:%M:%S %p" (12h)
+    static std::string timestampToDateTime(time_t timestamp, std::string params)
+    {
+        time_t m_timestamp = timestamp;
 
-        std::uniform_int_distribution<> distr(min, max);
-
-        return distr(gen);
+        std::tm time_info;
+#ifdef _WIN32
+        localtime_s(&time_info, &m_timestamp);
+#else
+        localtime_r(&m_timestamp, &time_info);
+#endif
+        std::stringstream ss;
+        ss << std::put_time(&time_info, params.c_str());
+        return ss.str();
     }
 }
 
