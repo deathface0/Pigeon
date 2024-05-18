@@ -66,27 +66,6 @@ namespace PigeonClientGUI
 			ImGui::NewLine();
 			ImGui::PushFont(Font::MadimiOne::px20);
 
-#ifdef __linux__
-			ImGui::Dummy(ImVec2(0.0f, 40.0f));
-			GUIUtils::TextCentered("Server Address");
-			ImGui::PushFont(Font::MadimiOne::px30);
-			GUIUtils::InputCentered("##addressField", Address, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
-			ImGui::PopFont();
-
-			ImGui::Dummy(ImVec2(0.0f, 10.0f));
-			GUIUtils::TextCentered("Port");
-			ImGui::PushFont(Font::MadimiOne::px30);
-			GUIUtils::InputCentered("##portField", Port, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
-			ImGui::PopFont();
-
-			ImGui::Dummy(ImVec2(0.0f, 10.0f));
-			GUIUtils::TextCentered("Username");
-			ImGui::PushFont(Font::MadimiOne::px30);
-			GUIUtils::InputCentered("##usernameField", Username, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
-			ImGui::PopFont();
-
-			ImGui::NewLine();
-#else
 			GUIUtils::TextCentered("Server Address");
 			GUIUtils::InputCentered("##addressField", Address, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
 
@@ -97,7 +76,6 @@ namespace PigeonClientGUI
 			GUIUtils::InputCentered("##usernameField", Username, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
 
 			ImGui::NewLine();
-#endif
 
 			if (GUIUtils::ButtonCentered("Connect", 200, 50) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
 			{
@@ -110,8 +88,8 @@ namespace PigeonClientGUI
 					return;
 				}
 
-				Address = "127.0.0.1";
-				Port = "4444";
+				/*Address = "127.0.0.1";
+				Port = "4444";*/
 
 				/*Username = "Ahuesag";*/
 
@@ -373,11 +351,7 @@ namespace PigeonClientGUI
 				focusMSG = false;
 			}
 
-#ifdef __linux__
-			ImGui::PushFont(Font::OpenSans::px45);
-#else
 			ImGui::PushFont(Font::OpenSans::px40);
-#endif
 
 			ImGui::PushItemWidth(windowWidth - 370);
 			ImGui::InputText("##MSG", &msg);
@@ -392,7 +366,7 @@ namespace PigeonClientGUI
 			}
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("Upload", Texture::upload, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
-				s_filepathFuture = std::async(std::launch::async, [&] {uploadFile(); return std::string(); });
+				s_filepathFuture = std::async(std::launch::async, [&] {uploadFile(); });
 			}
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("Settings", Texture::settings, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
@@ -578,6 +552,11 @@ namespace PigeonClientGUI
 		style.GrabRounding = 3;
 		style.LogSliderDeadzone = 4;
 		style.TabRounding = 4;
+
+		style.ScaleAllSizes(2.5);
+
+		ImGui::GetStyle().WindowMinSize.x = 32;
+		ImGui::GetStyle().WindowMinSize.y = 32;
 
 		ImGui::GetStyle().WindowRounding = 0.0f;
 		ImGui::GetStyle().ChildRounding = 0.0f;
