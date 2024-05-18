@@ -38,7 +38,7 @@ enum MSG_TYPE
 	PIGEON_FILE
 };
 
-static struct GUI_MSG
+struct GUI_MSG
 {
 	MSG_TYPE type;
 	std::string username;
@@ -95,6 +95,6 @@ namespace Font {
 		inline ImFont* px10, *px20, *px30, *px40, *px50;
 	}
 	namespace OpenSans {
-		inline ImFont* px10, *px20, *px30, *px40, *px50;
+		inline ImFont* px10, *px20, *px30, *px40, *px45, *px50;
 	}
 }
