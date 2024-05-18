@@ -45,9 +45,9 @@ namespace PigeonClientGUI
 {
 	PigeonClient* client = nullptr;
 
-    SDL_Window* sdlWindow = nullptr;
-    SDL_GLContext glContext = NULL;
-    SDL_Event currentEvent;
+	SDL_Window* sdlWindow = nullptr;
+	SDL_GLContext glContext = NULL;
+	SDL_Event currentEvent;
 
 	static std::future<std::string> s_filepathFuture;
 
@@ -56,8 +56,9 @@ namespace PigeonClientGUI
 		void WelcomePage()
 		{
 			//Title
-			//ImGui::PushFont(Font::MadimiOne::px50);
+			ImGui::PushFont(Font::MadimiOne::px50);
 			GUIUtils::TextCentered("Welcome to Pigeon");
+			ImGui::PopFont();
 
 			//Logo
 			GUIUtils::ImageCentered("Logo", Texture::welcome, 250, 250);
@@ -65,7 +66,29 @@ namespace PigeonClientGUI
 
 			//Form
 			ImGui::NewLine();
-			//ImGui::PushFont(Font::MadimiOne::px20);
+			ImGui::PushFont(Font::MadimiOne::px20);
+
+#ifdef __linux__
+			ImGui::Dummy(ImVec2(0.0f, 40.0f));
+			GUIUtils::TextCentered("Server Address");
+			ImGui::PushFont(Font::MadimiOne::px30);
+			GUIUtils::InputCentered("##addressField", Address, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
+			ImGui::PopFont();
+
+			ImGui::Dummy(ImVec2(0.0f, 10.0f));
+			GUIUtils::TextCentered("Port");
+			ImGui::PushFont(Font::MadimiOne::px30);
+			GUIUtils::InputCentered("##portField", Port, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
+			ImGui::PopFont();
+
+			ImGui::Dummy(ImVec2(0.0f, 10.0f));
+			GUIUtils::TextCentered("Username");
+			ImGui::PushFont(Font::MadimiOne::px30);
+			GUIUtils::InputCentered("##usernameField", Username, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
+			ImGui::PopFont();
+
+			ImGui::NewLine();
+#else
 			GUIUtils::TextCentered("Server Address");
 			GUIUtils::InputCentered("##addressField", Address, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
 
@@ -76,6 +99,8 @@ namespace PigeonClientGUI
 			GUIUtils::InputCentered("##usernameField", Username, 400, fetchingData ? ImGuiInputTextFlags_ReadOnly : ImGuiInputTextFlags_CharsNoBlank);
 
 			ImGui::NewLine();
+#endif
+
 			if (GUIUtils::ButtonCentered("Connect", 200, 50) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
 			{
 				/*if (Address.empty() || Port.empty() || Username.empty())
@@ -89,12 +114,13 @@ namespace PigeonClientGUI
 
 				Address = "127.0.0.1";
 				Port = "4444";
-				
+
 				/*Username = "Ahuesag";*/
 
 				client = new PigeonClient(Address, stoi(Port), Username);
 				client->Run();
 			}
+			ImGui::PopFont();
 		}
 	}
 
@@ -125,18 +151,18 @@ namespace PigeonClientGUI
 
 			if (ext != ".png" && ext != ".jpg" && ext != ".jpeg")
 			{
-				ImGui::SetCursorPosX(10); ImGui::Text("%s:", username);
+				ImGui::SetCursorPosX(10); ImGui::Text("%s:", username.c_str());
 				ImGui::Dummy(ImVec2(0.0f, 10.0f)); ImGui::SetCursorPosX(7); GUIUtils::Image(label, Texture::file, 40, 40);
 				ImGui::SameLine();
 
 				ImVec2 textPos = ImGui::GetCursorScreenPos();
 				ImVec2 textSize = ImGui::CalcTextSize(file.c_str());
 
-				if (ImGui::IsMouseHoveringRect(textPos, { textPos.x + textSize.x, textPos.y + + textSize.y }))
+				if (ImGui::IsMouseHoveringRect(textPos, { textPos.x + textSize.x, textPos.y + +textSize.y }))
 				{
-					//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
 					ImGui::Text("%s", file.c_str());
-					//ImGui::PopStyleColor();
+					ImGui::PopStyleColor();
 
 					if (ImGui::IsMouseClicked(0))
 					{
@@ -150,7 +176,7 @@ namespace PigeonClientGUI
 				{
 					ImGui::Text("%s", file.c_str());
 				}
-				
+
 			}
 			else {
 				//RENDER IMAGE
@@ -166,7 +192,7 @@ namespace PigeonClientGUI
 				switch (msg.type) {
 				case MSG_TYPE::PIGEON_TEXT:
 					ImGui::SetCursorPosX(10);
-					ImGui::Text("%s: %s", msg.username, msg.content);
+					ImGui::Text("%s: %s", msg.username.c_str(), msg.content.c_str());
 					ImGui::Separator();
 					break;
 				case MSG_TYPE::PIGEON_FILE:
@@ -202,7 +228,7 @@ namespace PigeonClientGUI
 
 			FILE* file = popen("zenity --file-selection", "r");
 
-			fgets(filepath_cstr,1024,file);
+			fgets(filepath_cstr, 1024, file);
 
 			std::string filepath(filepath_cstr);
 			filepath.pop_back();
@@ -230,12 +256,12 @@ namespace PigeonClientGUI
 
 
 		void LeftMenu() {
-			//ImGui::PushFont(Font::OpenSans::px30);
+			ImGui::PushFont(Font::OpenSans::px30);
 
 			ImGui::BeginChild("Left Menu", ImVec2(220, windowHeight), true);
 
 			ImGui::BeginChild("Connected clients", ImVec2(220, windowHeight - 50), true);
-			
+
 			int clientIndex = 0; ImVec2 clientStatusPos = { 10, 10 };
 			for (const auto& pair : Users) {
 				ImGui::SetCursorPos(clientStatusPos);
@@ -271,7 +297,7 @@ namespace PigeonClientGUI
 				ImGui::Begin("Status window", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
 
 				if (!ImGui::IsWindowFocused() && !selecting) //Maintain window on top
-					ImGui::SetWindowFocus(); 
+					ImGui::SetWindowFocus();
 
 				selecting = false;
 				ImGui::SetNextItemWidth(220);
@@ -296,34 +322,38 @@ namespace PigeonClientGUI
 			ImGui::EndChild(); //End of User Status Child
 
 			ImGui::EndChild(); //End of Left Menu Child
+
+			ImGui::PopFont();
 		}
 
 		void RightMenu()
 		{
+			ImGui::PushFont(Font::OpenSans::px20);
+
 			ImGui::BeginChild("Chat", ImVec2(windowWidth - 220, windowHeight), true);
 
 			ImGui::BeginChild("Chat Info", ImVec2(windowWidth - 220, 50), true);
-			
+
 			int TextSize = 0;
 
 			ImGui::SetCursorPosY(10);
 			ImGui::SetCursorPosX(infoPos);
-			//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.525, 0.502, 0.89, 1.00f));
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.525, 0.502, 0.89, 1.00f));
 			ImGui::Text("Connected to \"%s\"", client->GetServername().c_str());
 			TextSize += ImGui::GetItemRectSize().x;
-			//ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
 			ImGui::SameLine();
 			ImGui::Text(" - ");
 			ImGui::SameLine();
-			//ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.89, 0.878, 0.129, 1.00f));
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.89, 0.878, 0.129, 1.00f));
 			ImGui::Text("\"%s\"", MOTD.c_str());
 			TextSize += ImGui::GetItemRectSize().x;
-			//ImGui::PopStyleColor();
+			ImGui::PopStyleColor();
 
 			infoPos++;
 			if (infoPos >= windowWidth - 220)
 				infoPos = -TextSize;
-			
+
 			ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 
 			ImGui::EndChild();
@@ -342,7 +372,12 @@ namespace PigeonClientGUI
 				ImGui::SetKeyboardFocusHere(0); //Maintain input text always selected
 				focusMSG = false;
 			}
-			//ImGui::PushFont(Font::OpenSans::px40);
+
+#ifdef __linux__
+			ImGui::PushFont(Font::OpenSans::px45);
+#else
+			ImGui::PushFont(Font::OpenSans::px40);
+#endif
 
 			ImGui::PushItemWidth(windowWidth - 370);
 			ImGui::InputText("##MSG", &msg);
@@ -368,10 +403,14 @@ namespace PigeonClientGUI
 				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::PRESENCE_UPDATE, Username, String::StringToBytes("DISCONNECT"));
 				client->SendPacket(pkg);
 			}
-			
+
+			ImGui::PopFont();
+
 			ImGui::EndChild(); //End of MSG Child
 
 			ImGui::EndChild(); //End of Chat Child
+
+			ImGui::PopFont();
 		}
 
 		void ChatPage()
@@ -379,6 +418,8 @@ namespace PigeonClientGUI
 			LeftMenu();
 			ImGui::SameLine();
 			RightMenu();
+
+			ImGui::PopStyleColor(3);
 		}
 	}
 
@@ -386,7 +427,7 @@ namespace PigeonClientGUI
 	{
 		void SettingsPage()
 		{
-			//ImGui::PushFont(Font::OpenSans::px30);
+			ImGui::PushFont(Font::OpenSans::px30);
 
 			ImGui::SetCursorPos(ImVec2(windowWidth - 80, 13));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 300);
@@ -394,7 +435,7 @@ namespace PigeonClientGUI
 				settings = false;
 			ImGui::PopStyleVar();
 
-			ImGui::SetCursorPos(ImVec2(20,80));
+			ImGui::SetCursorPos(ImVec2(20, 80));
 			ImGui::BeginChild("##DownloadPath", ImVec2(windowWidth - 100, 40), true);
 			ImGui::PushItemWidth(600);
 			ImGui::InputText("##DownloadPath", &donwloadPath);
@@ -411,7 +452,7 @@ namespace PigeonClientGUI
 
 						FILE* file = popen("zenity  --file-selection --directory", "r");
 
-						fgets(filepath_cstr,1024,file);
+						fgets(filepath_cstr, 1024, file);
 
 						std::string path(filepath_cstr);
 						path.pop_back();
@@ -425,32 +466,34 @@ namespace PigeonClientGUI
 			ImGui::SameLine(); ImGui::Dummy(ImVec2(10, 0)); ImGui::SameLine();
 			ImGui::Text("Download path");
 			ImGui::EndChild();
+
+			ImGui::PopStyleColor(3);
+			ImGui::PopFont();
 		}
 	}
 
 
-    int CreateImGuiWindow()
-    {
-        SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
+	int CreateImGuiWindow()
+	{
+		SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
 
-        sdlWindow = SDL_CreateWindow("Pigeon Client", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, window_flags);
+		sdlWindow = SDL_CreateWindow("Pigeon Client", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, window_flags);
 
-        glContext = SDL_GL_CreateContext(sdlWindow);
-        if (SDL_GL_MakeCurrent(sdlWindow, glContext) != 0) {
-            std::cerr << "Error setting up OpenGL context " << std::endl;
-            return -1;
-        };
+		glContext = SDL_GL_CreateContext(sdlWindow);
+		if (SDL_GL_MakeCurrent(sdlWindow, glContext) != 0) {
+			std::cerr << "Error setting up OpenGL context " << std::endl;
+			return -1;
+		};
 
-        if (glewInit() != GLEW_OK) {
-            std::cout << "Error initializing glew" << std::endl;
-        }
+		if (glewInit() != GLEW_OK) {
+			std::cout << "Error initializing glew" << std::endl;
+		}
 
-        SDL_GL_SetSwapInterval(1);
-        return 0;
-    }
+		SDL_GL_SetSwapInterval(1);
+		return 0;
+	}
 
 	void SetUpStyle() {
-		
 		ImVec4* colors = ImGui::GetStyle().Colors;
 		colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 		colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
@@ -533,8 +576,6 @@ namespace PigeonClientGUI
 		style.GrabRounding = 3;
 		style.LogSliderDeadzone = 4;
 		style.TabRounding = 4;
-		
-		//style.ScaleAllSizes(1);
 
 		ImGui::GetStyle().WindowRounding = 0.0f;
 		ImGui::GetStyle().ChildRounding = 0.0f;
@@ -543,7 +584,6 @@ namespace PigeonClientGUI
 		ImGui::GetStyle().PopupRounding = 0.0f;
 		ImGui::GetStyle().ScrollbarRounding = 0.0f;
 		ImGui::GetStyle().FrameRounding = 100.f;
-		
 	}
 
 	void SetChatStyle()
@@ -552,56 +592,56 @@ namespace PigeonClientGUI
 		ImGui::GetStyle().FrameRounding = 0.f;
 		ImGui::GetStyle().ItemSpacing = ImVec2(0.00f, 0.00f);
 
-	//ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
-		//ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
-		//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.f, 0.f, 0.f, 0.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.f, 0.f, 0.f, 0.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 1.f));
 	}
 
-    void SetUpImGui() {
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
+	void SetUpImGui() {
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
 
-        //Docking creo que esta bug con SDL, con glfw si funciona
-        //imIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        //imIO.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+		//Docking creo que esta bug con SDL, con glfw si funciona
+		//imIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		//imIO.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
-        ImGui::StyleColorsDark();
+		ImGui::StyleColorsDark();
 
-        ImGui_ImplSDL2_InitForOpenGL(sdlWindow, glContext);
-        ImGui_ImplOpenGL3_Init("#version 330 core");
-        SetUpStyle();
+		ImGui_ImplSDL2_InitForOpenGL(sdlWindow, glContext);
+		ImGui_ImplOpenGL3_Init("#version 330 core");
+		SetUpStyle();
 
 		ImGui::GetIO().IniFilename = NULL;
-    }
+	}
 
-    void StartImGuiFrame() {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
+	void StartImGuiFrame() {
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
 
-        //This is to make the first imgui window fill all the sdl window
-        ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight));
-        ImGui::SetNextWindowPos(ImVec2(0, 0));
-    }
+		//This is to make the first imgui window fill all the sdl window
+		ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight));
+		ImGui::SetNextWindowPos(ImVec2(0, 0));
+	}
 
-    void Render() {
-        //End of the main window
-        ImGui::End();
-        ImGui::Render();
+	void Render() {
+		//End of the main window
+		ImGui::End();
+		ImGui::Render();
 
-        glViewport(0, 0, ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
+		glViewport(0, 0, ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
 
-        glClearColor(0.10f, 0.10f, 0.10f, 1.00f);
-        glClear(GL_COLOR_BUFFER_BIT);
-		
+		glClearColor(0.10f, 0.10f, 0.10f, 1.00f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
 		//stbi_image_free(imageData);
 
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        SDL_GL_SwapWindow(sdlWindow);
-    }
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		SDL_GL_SwapWindow(sdlWindow);
+	}
 
-    void MainWindow() {
-        ImGui::Begin("Pigeon Client", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	void MainWindow() {
+		ImGui::Begin("Pigeon Client", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
 		//Resize Imgui window
 		SDL_GetWindowSize(sdlWindow, &windowWidth, &windowHeight);
@@ -635,7 +675,7 @@ namespace PigeonClientGUI
 			Settings::SettingsPage();
 			break;
 		}
-    }
+	}
 
 	void Cleanup() {
 		ImGui_ImplOpenGL3_Shutdown();

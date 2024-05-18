@@ -94,6 +94,6 @@ namespace Font {
 		inline ImFont* px10, *px20, *px30, *px40, *px50;
 	}
 	namespace OpenSans {
-		inline ImFont* px10, *px20, *px30, *px40, *px50;
+		inline ImFont* px10, *px20, *px30, *px40, *px45, *px50;
 	}
 }
