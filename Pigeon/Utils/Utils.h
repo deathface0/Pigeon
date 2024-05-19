@@ -31,7 +31,7 @@
 #include <Windows.h>
 #include <ShlObj.h>
 #include <tchar.h>
-
+#include <filesystem>
 
 #endif
 
@@ -298,7 +298,7 @@ namespace B64 {
 
 namespace GUIUtils
 {
-    inline void generateTexture(std::string imagePath, GLuint& texture)
+    inline void generateTexture(std::string imagePath, GLuint* texture)
     {
         int temp_size;
         int channels;
@@ -306,12 +306,56 @@ namespace GUIUtils
         assert(my_image_data != NULL);
 
         // Turn the RGBA pixel data into an OpenGL texture:
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glGenTextures(1, texture);
+        glBindTexture(GL_TEXTURE_2D, *texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, temp_size, temp_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
 
         stbi_image_free(my_image_data);
+    }
+
+    inline void textureLoader(std::string path)
+    {
+        for (const auto& entry : std::filesystem::directory_iterator(path)) {
+            // Check if the entry is a file
+            if (entry.is_regular_file()) {
+                GLuint* texture = new GLuint;
+                std::string filename = entry.path().filename().string();
+
+                generateTexture(path + filename, texture);
+
+                //Erasing file extension
+                size_t pos = filename.find_last_of('.');
+                filename = filename.substr(0, pos);
+                
+                Texture::textures.insert({ filename, texture });
+            }
+        }
+    }
+
+    inline void fontLoader(std::string path)
+    {
+        for (const auto& entry : std::filesystem::directory_iterator(path)) {
+            // Check if the entry is a file
+            if (entry.is_regular_file()) {
+                std::string filename = entry.path().filename().string();
+                std::string filepath = path + filename;
+
+                Font::Font* font = new Font::Font;
+                font->px10 = ImGui::GetIO().Fonts->AddFontFromFileTTF(filepath.c_str(), 10);
+                font->px20 = ImGui::GetIO().Fonts->AddFontFromFileTTF(filepath.c_str(), 20);
+                font->px30 = ImGui::GetIO().Fonts->AddFontFromFileTTF(filepath.c_str(), 30);
+                font->px40 = ImGui::GetIO().Fonts->AddFontFromFileTTF(filepath.c_str(), 40);
+                font->px50 = ImGui::GetIO().Fonts->AddFontFromFileTTF(filepath.c_str(), 50);
+
+                //Erasing file extension
+                size_t pos = filename.find_last_of('.');
+                filename = filename.substr(0, pos);
+
+                Font::fonts.insert({ filename, font });
+
+            }
+        }
     }
 
     inline void TextCentered(const std::string text) {

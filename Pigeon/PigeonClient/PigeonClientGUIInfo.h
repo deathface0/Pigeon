@@ -82,20 +82,14 @@ namespace PigeonClientGUIInfo
 }
 
 namespace Texture {
-	inline GLuint welcome;
-	inline GLuint your_icon;
-	inline GLuint upload, settings, disconnect;
-	inline GLuint online, idle, dnd, error;
-	inline GLuint file;
-	inline GLuint close;
-	inline GLuint folder;
+	inline std::unordered_map<std::string, GLuint*> textures;
 }
 
 namespace Font {
-	namespace MadimiOne {
-		inline ImFont* px10, *px20, *px30, *px40, *px50;
-	}
-	namespace OpenSans {
-		inline ImFont* px10, *px20, *px30, *px40, *px50;
-	}
+	struct Font
+	{
+		ImFont* px10, * px20, * px30, * px40, * px50;
+	};
+
+	inline std::unordered_map<std::string, Font*> fonts;
 }
