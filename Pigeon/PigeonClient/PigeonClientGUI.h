@@ -120,7 +120,7 @@ namespace PigeonClientGUI
 			}
 		}
 
-		void renderFileUpload(std::vector<unsigned char> buf, time_t timestamp, std::string username, std::string filename, std::string ext)
+		bool renderFileUpload(std::vector<unsigned char> buf, time_t timestamp, std::string username, std::string filename, std::string ext)
 		{
 			static int numFiles = 0;
 			std::string label = "File" + std::to_string(numFiles++);
@@ -155,6 +155,7 @@ namespace PigeonClientGUI
 					ImGui::Text("%s", file.c_str());
 				}
 
+				return true;
 			}
 			else {
 				std::string imagename = std::to_string(timestamp) + '_' + filename;
@@ -165,7 +166,8 @@ namespace PigeonClientGUI
 				if (Texture::textures.find(imagename) == Texture::textures.end()) 
 				{
 					image = new Texture::Image;
-					GUIUtils::generateTexture(buf, image);
+					if (!GUIUtils::generateTexture(buf, image))
+						return false;
 
 					Texture::textures.insert({ imagename, image });
 				}
@@ -179,11 +181,8 @@ namespace PigeonClientGUI
 					double factorH = maxSize / (double)h;
 					double aspectRatio = factorW <= factorH ? factorW : factorH;
 
-					double dW = (double)w * aspectRatio;
-					double dH = (double)h * aspectRatio;
-
-					w = dW;
-					h = dH;
+					w = (double)w * aspectRatio;
+					h = (double)h * aspectRatio;
 				}
 
 				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, h + 50), true);
@@ -193,6 +192,8 @@ namespace PigeonClientGUI
 
 				ImGui::SetCursorPosX(10);
 				GUIUtils::Image(imagename, Texture::textures[imagename]->texture, w, h);
+
+				return true;
 			}
 
 			ImGui::EndChild();
@@ -200,8 +201,10 @@ namespace PigeonClientGUI
 
 		void printMsgBuffer()
 		{	
-			for (const auto& msg : msgBuffer)
+			for (auto it = msgBuffer.begin(); it != msgBuffer.end(); )
 			{
+				const auto& msg = *it;
+
 				switch (msg.type) {
 				case MSG_TYPE::PIGEON_TEXT:
 					ImGui::SetCursorPosX(10);
@@ -225,7 +228,9 @@ namespace PigeonClientGUI
 					std::transform(ext.begin(), ext.end(), ext.begin(),
 						[](unsigned char c) { return std::tolower(c); });
 
-					renderFileUpload(msg.buf, msg.timestamp, msg.username, filename, ext);
+					if (!renderFileUpload(msg.buf, msg.timestamp, msg.username, filename, ext))
+						it = msgBuffer.erase(it);
+
 					ImGui::Separator();
 					break;
 				}

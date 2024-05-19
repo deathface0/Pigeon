@@ -301,22 +301,32 @@ namespace B64 {
 
 namespace GUIUtils
 {
-    inline void generateTexture(std::string imagePath, Texture::Image* image)
+    inline bool generateTexture(std::string imagePath, Texture::Image* image)
     {
         int channels;
-        unsigned char* my_image_data = stbi_load(imagePath.c_str(), &image->width, &image->height, &channels, 4);
-        assert(my_image_data != NULL);
+        stbi_uc* img = stbi_load(imagePath.c_str(), &image->width, &image->height, &channels, 4);
+        assert(img != NULL);
 
-        // Turn the RGBA pixel data into an OpenGL texture:
-        glGenTextures(1, &image->texture);
-        glBindTexture(GL_TEXTURE_2D, image->texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
+        if (img)
+        {
+            // Turn the RGBA pixel data into an OpenGL texture:
+            glGenTextures(1, &image->texture);
+            glBindTexture(GL_TEXTURE_2D, image->texture);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
 
-        stbi_image_free(my_image_data);
+            stbi_image_free(img);
+
+            return true;
+        }
+        else 
+        {
+            return false;
+        }
+        
     }
 
-    inline void generateTexture(const std::vector<unsigned char>& buffer, Texture::Image* image)
+    inline bool generateTexture(const std::vector<unsigned char>& buffer, Texture::Image* image)
     {
         int channels;
         stbi_uc* img = stbi_load_from_memory(buffer.data(), buffer.size(), &image->width, &image->height, &channels, 0);
@@ -337,7 +347,7 @@ namespace GUIUtils
             else {
                 std::cout << "Unsupported number of channels: " << channels << std::endl;
                 stbi_image_free(img);  // Corrected to free the right pointer
-                return;
+                return true;
             }
 
             glTexImage2D(GL_TEXTURE_2D, 0, format, image->width, image->height, 0, format, GL_UNSIGNED_BYTE, img);  // Corrected height parameter
@@ -353,7 +363,8 @@ namespace GUIUtils
         }
         else {
             std::cout << "FAILED TO LOAD IMAGE FROM BUFFER: " << stbi_failure_reason() << std::endl;
-            // Failed to load image
+
+            return false;
         }
     }
 
