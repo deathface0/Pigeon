@@ -158,22 +158,41 @@ namespace PigeonClientGUI
 			}
 			else {
 				std::string imagename = std::to_string(timestamp) + '_' + filename;
-				int height = Texture::textures.find(imagename) != Texture::textures.end() ? 50 + Texture::textures[imagename]->height : 100;
+				int w, h;
 
-				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, 500), true);
-
-				ImGui::SetCursorPosX(10); ImGui::Text("%s - %s:", Time::timestampToDateTime(timestamp, "%Y-%m-%d %H:%M:%S").c_str(), username.c_str());
-				ImGui::Dummy(ImVec2(0.0f, 10.0f));
-
-				if (Texture::textures.find(imagename) == Texture::textures.end())
+				//Generate texture if not exist
+				Texture::Image* image = nullptr;
+				if (Texture::textures.find(imagename) == Texture::textures.end()) 
 				{
-					Texture::Image* image = new Texture::Image;
-					GUIUtils::generateTexture( buf, image);
+					image = new Texture::Image;
+					GUIUtils::generateTexture(buf, image);
 
 					Texture::textures.insert({ imagename, image });
 				}
 
-				GUIUtils::Image(imagename, Texture::textures[imagename]->texture, Texture::textures[imagename]->width, Texture::textures[imagename]->height);
+				w = image ? image->width : Texture::textures[imagename]->width;
+				h = image ? image->height : Texture::textures[imagename]->height;
+
+				double maxSize = 500.0f;
+				if (w > maxSize || h > maxSize) {
+					double factorW = maxSize / (double)w;
+					double factorH = maxSize / (double)h;
+					double aspectRatio = factorW <= factorH ? factorW : factorH;
+
+					double dW = (double)w * aspectRatio;
+					double dH = (double)h * aspectRatio;
+
+					w = dW;
+					h = dH;
+				}
+
+				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, h + 50), true);
+
+				ImGui::SetCursorPosX(10); ImGui::Text("%s - %s:", Time::timestampToDateTime(timestamp, "%Y-%m-%d %H:%M:%S").c_str(), username.c_str());
+				ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+				ImGui::SetCursorPosX(10);
+				GUIUtils::Image(imagename, Texture::textures[imagename]->texture, w, h);
 			}
 
 			ImGui::EndChild();
