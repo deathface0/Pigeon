@@ -40,6 +40,7 @@ enum MSG_TYPE
 
 struct GUI_MSG
 {
+	std::vector<unsigned char> buf;
 	MSG_TYPE type;
 	time_t timestamp;
 	std::string username;
@@ -82,7 +83,13 @@ namespace PigeonClientGUIInfo
 }
 
 namespace Texture {
-	inline std::unordered_map<std::string, GLuint*> textures;
+	struct Image 
+	{
+		GLuint texture;
+		int width, height;
+	};
+
+	inline std::unordered_map<std::string, Image*> textures;
 }
 
 namespace Font {

@@ -45,6 +45,9 @@
 #include <random>
 #include <sstream>
 
+#include <SDL2/SDL.h>
+#include <GLEW/GL/glew.h>
+
 
 namespace File {
     static bool BufferToDisk(const std::vector<unsigned char>& buffer, const std::string& filename) {
@@ -298,37 +301,78 @@ namespace B64 {
 
 namespace GUIUtils
 {
-    inline void generateTexture(std::string imagePath, GLuint* texture)
+    inline void generateTexture(std::string imagePath, Texture::Image* image)
     {
-        int temp_size;
         int channels;
-        unsigned char* my_image_data = stbi_load(imagePath.c_str(), &temp_size, &temp_size, &channels, 4);
+        unsigned char* my_image_data = stbi_load(imagePath.c_str(), &image->width, &image->height, &channels, 4);
         assert(my_image_data != NULL);
 
         // Turn the RGBA pixel data into an OpenGL texture:
-        glGenTextures(1, texture);
-        glBindTexture(GL_TEXTURE_2D, *texture);
+        glGenTextures(1, &image->texture);
+        glBindTexture(GL_TEXTURE_2D, image->texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, temp_size, temp_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, my_image_data);
 
         stbi_image_free(my_image_data);
     }
+
+    inline void generateTexture(const std::vector<unsigned char>& buffer, Texture::Image* image)
+    {
+        int channels;
+        stbi_uc* img = stbi_load_from_memory(buffer.data(), buffer.size(), &image->width, &image->height, &channels, 0);
+
+        if (img) {
+            // Image loaded successfully
+            glGenTextures(1, &image->texture);
+            glBindTexture(GL_TEXTURE_2D, image->texture);
+
+            // Determine the format based on the number of channels
+            GLenum format;
+            if (channels == 1)
+                format = GL_RED;
+            else if (channels == 3)
+                format = GL_RGB;
+            else if (channels == 4)
+                format = GL_RGBA;
+            else {
+                std::cout << "Unsupported number of channels: " << channels << std::endl;
+                stbi_image_free(img);  // Corrected to free the right pointer
+                return;
+            }
+
+            glTexImage2D(GL_TEXTURE_2D, 0, format, image->width, image->height, 0, format, GL_UNSIGNED_BYTE, img);  // Corrected height parameter
+
+            // Set texture parameters
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            // Free the image data after usage
+            stbi_image_free(img);
+        }
+        else {
+            std::cout << "FAILED TO LOAD IMAGE FROM BUFFER: " << stbi_failure_reason() << std::endl;
+            // Failed to load image
+        }
+    }
+
 
     inline void textureLoader(std::string path)
     {
         for (const auto& entry : std::filesystem::directory_iterator(path)) {
             // Check if the entry is a file
             if (entry.is_regular_file()) {
-                GLuint* texture = new GLuint;
+                Texture::Image* image = new Texture::Image;
                 std::string filename = entry.path().filename().string();
 
-                generateTexture(path + filename, texture);
+                generateTexture(path + filename, image);
 
                 //Erasing file extension
                 size_t pos = filename.find_last_of('.');
                 filename = filename.substr(0, pos);
                 
-                Texture::textures.insert({ filename, texture });
+                Texture::textures.insert({ filename, image });
             }
         }
     }

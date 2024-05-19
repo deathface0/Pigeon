@@ -1,6 +1,7 @@
 #include "PigeonClient.h"
 
-PigeonClient::PigeonClient(const std::string& host, unsigned short port, const std::string& username): m_host(host),m_port(port),m_username(username)
+PigeonClient::PigeonClient(const std::string& host, unsigned short port, const std::string& username):
+    m_host(host),m_port(port),m_username(username)
 {
 #ifdef _WIN32
 	this->m_client = new WindowsTcpClient(m_host, m_port);
@@ -222,7 +223,7 @@ void* PigeonClient::ProcessPacket()
             //send message to GUI...
             cmsg = std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end());
             //PigeonClientGUIInfo::msgBuffer.appendf("%s\n", cmsg.c_str());
-            PigeonClientGUIInfo::msgBuffer.push_back({ MSG_TYPE::PIGEON_TEXT, pkt.HEADER.TIME_STAMP , pkt.HEADER.username, cmsg });
+            PigeonClientGUIInfo::msgBuffer.push_back({ {}, MSG_TYPE::PIGEON_TEXT, pkt.HEADER.TIME_STAMP , pkt.HEADER.username, cmsg });
 
             //std::thread([&]() {m_soundPlayer.play(PigeonClientGUIInfo::msgAudioPath); }).detach();
 
@@ -237,13 +238,23 @@ void* PigeonClient::ProcessPacket()
                 break;
             }
 
-            std::string filename = value["filename"].asString() + "." + value["ext"].asString();
+            std::string filename = value["filename"].asString();
+            std::string ext = value["ext"].asString();
 
             if (filename.empty()) {
                 break;
             }
 
-            PigeonClientGUIInfo::msgBuffer.push_back({ MSG_TYPE::PIGEON_FILE, pkt.HEADER.TIME_STAMP, pkt.HEADER.username, filename });
+            if (ext == "png" || ext == "jpg" || ext == "jpeg")
+            {
+                std::string json = R"({"filename":")" + std::to_string(pkt.HEADER.TIME_STAMP) + '_' + filename + R"("})";
+                PigeonPacket downPacket = BuildPacket(MEDIA_DOWNLOAD, pkt.HEADER.username, std::vector<unsigned char>(json.begin(), json.end()));
+                SendPacket(downPacket);
+
+                break;
+            }
+
+            PigeonClientGUIInfo::msgBuffer.push_back({{}, MSG_TYPE::PIGEON_FILE, pkt.HEADER.TIME_STAMP, pkt.HEADER.username, filename + '.' + ext});
 
             std::cout << "New media file by: " << pkt.HEADER.username << " Filename: " << filename << std::endl;
             filePaths.push_back(filename);
@@ -265,10 +276,15 @@ void* PigeonClient::ProcessPacket()
 
             auto buf = String::StringToBytes(B64::base64_decode(content));
 
-            //new file to download, update UI
-            std::cout << File::BufferToDisk(buf, PigeonClientGUIInfo::donwloadPath + '/' + filename + '.' + ext) << std::endl;
-            break;
+            if (ext != "png" && ext != "jpg" && ext != "jpeg")
+            {
+                PigeonClientGUIInfo::msgBuffer.push_back({ {}, MSG_TYPE::PIGEON_FILE, pkt.HEADER.TIME_STAMP, pkt.HEADER.username, filename + '.' + ext });
+                std::cout << File::BufferToDisk(buf, PigeonClientGUIInfo::donwloadPath + '/' + filename + '.' + ext) << std::endl;
+                break;
+            }
 
+            PigeonClientGUIInfo::msgBuffer.push_back({ buf, MSG_TYPE::PIGEON_FILE, pkt.HEADER.TIME_STAMP, pkt.HEADER.username, filename + '.' + ext });
+            break;
         }            
         default:
             break;

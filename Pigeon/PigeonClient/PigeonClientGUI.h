@@ -60,7 +60,7 @@ namespace PigeonClientGUI
 			ImGui::PopFont();
 
 			//Logo
-			GUIUtils::ImageCentered("Logo", *Texture::textures["logo"], 250, 250);
+			GUIUtils::ImageCentered("Logo", Texture::textures["logo"]->texture, 250, 250);
 
 
 			//Form
@@ -80,8 +80,8 @@ namespace PigeonClientGUI
 
 			if (GUIUtils::ButtonCentered("Connect", 200, 50) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
 			{
-				if (Address.empty() || Port.empty() || Username.empty())
-					return;
+				/*if (Address.empty() || Port.empty() || Username.empty())
+					return;*/
 
 				if (Username.size() > MAX_USERNAME)
 				{
@@ -89,8 +89,8 @@ namespace PigeonClientGUI
 					return;
 				}
 
-				/*Address = "127.0.0.1";
-				Port = "4444";*/
+				Address = "192.168.1.136";
+				Port = "4444";
 
 				/*Username = "Ahuesag";*/
 
@@ -110,28 +110,28 @@ namespace PigeonClientGUI
 			switch (status)
 			{
 			case 0:
-				return *Texture::textures["online_status"];
+				return Texture::textures["online_status"]->texture;
 			case 1:
-				return *Texture::textures["idle_status"];
+				return Texture::textures["idle_status"]->texture;
 			case 2:
-				return *Texture::textures["dnd_status"];
+				return Texture::textures["dnd_status"]->texture;
 			default:
-				return *Texture::textures["error_status"];
+				return Texture::textures["error_status"]->texture;
 			}
 		}
 
-		void renderFileUpload(time_t timestamp, std::string username, std::string filename, std::string ext)
+		void renderFileUpload(std::vector<unsigned char> buf, time_t timestamp, std::string username, std::string filename, std::string ext)
 		{
 			static int numFiles = 0;
 			std::string label = "File" + std::to_string(numFiles++);
 			std::string file = filename + ext;
 
-			ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, 100), true);
-
 			if (ext != ".png" && ext != ".jpg" && ext != ".jpeg")
 			{
+				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, 100), true);
+
 				ImGui::SetCursorPosX(10); ImGui::Text("%s - %s:", Time::timestampToDateTime(timestamp, "%Y-%m-%d %H:%M:%S").c_str(), username.c_str());
-				ImGui::Dummy(ImVec2(0.0f, 10.0f)); ImGui::SetCursorPosX(7); GUIUtils::Image(label, *Texture::textures["file"], 40, 40);
+				ImGui::Dummy(ImVec2(0.0f, 10.0f)); ImGui::SetCursorPosX(7); GUIUtils::Image(label, Texture::textures["file"]->texture, 40, 40);
 				ImGui::SameLine();
 
 				ImVec2 textPos = ImGui::GetCursorScreenPos();
@@ -146,7 +146,6 @@ namespace PigeonClientGUI
 					if (ImGui::IsMouseClicked(0))
 					{
 						std::string json = R"({"filename":")" + std::to_string(timestamp) + '_' + filename + R"("})";
-						std::cout << json << std::endl;
 						PigeonPacket pkt = client->BuildPacket(MEDIA_DOWNLOAD, Username, std::vector<unsigned char>(json.begin(), json.end()));
 						client->SendPacket(pkt);
 					}
@@ -158,14 +157,30 @@ namespace PigeonClientGUI
 
 			}
 			else {
-				//RENDER IMAGE
+				std::string imagename = std::to_string(timestamp) + '_' + filename;
+				int height = Texture::textures.find(imagename) != Texture::textures.end() ? 50 + Texture::textures[imagename]->height : 100;
+
+				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, 500), true);
+
+				ImGui::SetCursorPosX(10); ImGui::Text("%s - %s:", Time::timestampToDateTime(timestamp, "%Y-%m-%d %H:%M:%S").c_str(), username.c_str());
+				ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+				if (Texture::textures.find(imagename) == Texture::textures.end())
+				{
+					Texture::Image* image = new Texture::Image;
+					GUIUtils::generateTexture( buf, image);
+
+					Texture::textures.insert({ imagename, image });
+				}
+
+				GUIUtils::Image(imagename, Texture::textures[imagename]->texture, Texture::textures[imagename]->width, Texture::textures[imagename]->height);
 			}
 
 			ImGui::EndChild();
 		}
 
 		void printMsgBuffer()
-		{
+		{	
 			for (const auto& msg : msgBuffer)
 			{
 				switch (msg.type) {
@@ -191,7 +206,7 @@ namespace PigeonClientGUI
 					std::transform(ext.begin(), ext.end(), ext.begin(),
 						[](unsigned char c) { return std::tolower(c); });
 
-					renderFileUpload(msg.timestamp, msg.username, filename, ext);
+					renderFileUpload(msg.buf, msg.timestamp, msg.username, filename, ext);
 					ImGui::Separator();
 					break;
 				}
@@ -354,15 +369,15 @@ namespace PigeonClientGUI
 				}
 			}
 			ImGui::SameLine();
-			if (GUIUtils::ImageButton("Upload", *Texture::textures["upload"], ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+			if (GUIUtils::ImageButton("Upload", Texture::textures["upload"]->texture, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 				s_filepathFuture = std::async(std::launch::async, [&] {uploadFile(); });
 			}
 			ImGui::SameLine();
-			if (GUIUtils::ImageButton("Settings", *Texture::textures["settings"], ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+			if (GUIUtils::ImageButton("Settings", Texture::textures["settings"]->texture, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 				settings = true;
 			}
 			ImGui::SameLine();
-			if (GUIUtils::ImageButton("Disconnect", *Texture::textures["exit"], ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
+			if (GUIUtils::ImageButton("Disconnect", Texture::textures["exit"]->texture, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
 				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::PRESENCE_UPDATE, Username, String::StringToBytes("DISCONNECT"));
 				client->SendPacket(pkg);
 
@@ -398,7 +413,7 @@ namespace PigeonClientGUI
 
 			ImGui::SetCursorPos(ImVec2(windowWidth - 80, 13));
 			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 300);
-			if (GUIUtils::ImageButton("##ReturnToChat", *Texture::textures["close"], ImVec2(40, 40)))
+			if (GUIUtils::ImageButton("##ReturnToChat", Texture::textures["close"]->texture, ImVec2(40, 40)))
 				settings = false;
 			ImGui::PopStyleVar();
 
@@ -407,7 +422,7 @@ namespace PigeonClientGUI
 			ImGui::PushItemWidth(600);
 			ImGui::InputText("##DownloadPath", &donwloadPath);
 			ImGui::SameLine();
-			if (GUIUtils::ImageButton("##SelectDownloadPath", *Texture::textures["folder"], ImVec2(30, 30)))
+			if (GUIUtils::ImageButton("##SelectDownloadPath", Texture::textures["folder"]->texture, ImVec2(30, 30)))
 			{
 				std::thread([&]()
 				{
@@ -432,6 +447,7 @@ namespace PigeonClientGUI
 
 		sdlWindow = SDL_CreateWindow("Pigeon Client", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, window_flags);
 
+		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 		glContext = SDL_GL_CreateContext(sdlWindow);
 		if (SDL_GL_MakeCurrent(sdlWindow, glContext) != 0) {
 			std::cerr << "Error setting up OpenGL context " << std::endl;

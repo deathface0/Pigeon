@@ -16,6 +16,7 @@
 #include <vector>
 #include <thread>
 #include <unordered_map>
+#include <mutex>
 
 #include "PigeonClientGUIInfo.h"
 #include "PigeonPacket.h"
