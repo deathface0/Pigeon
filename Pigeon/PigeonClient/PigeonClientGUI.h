@@ -154,8 +154,6 @@ namespace PigeonClientGUI
 				{
 					ImGui::Text("%s", file.c_str());
 				}
-
-				return true;
 			}
 			else {
 				std::string imagename = std::to_string(timestamp) + '_' + filename;
@@ -192,18 +190,19 @@ namespace PigeonClientGUI
 
 				ImGui::SetCursorPosX(10);
 				GUIUtils::Image(imagename, Texture::textures[imagename]->texture, w, h);
-
-				return true;
 			}
 
 			ImGui::EndChild();
+
+			return true;
 		}
 
 		void printMsgBuffer()
 		{	
-			for (auto it = msgBuffer.begin(); it != msgBuffer.end(); )
+			int count = 0;
+			for (auto it = msgBuffer.begin(); it != msgBuffer.end(); it++ )
 			{
-				const auto& msg = *it;
+				const GUI_MSG& msg = *it;
 
 				switch (msg.type) {
 				case MSG_TYPE::PIGEON_TEXT:
@@ -406,6 +405,7 @@ namespace PigeonClientGUI
 				client->SendPacket(pkg);
 
 				msgBuffer.clear();
+				Texture::textures.clear();
 			}
 
 			ImGui::PopFont();
