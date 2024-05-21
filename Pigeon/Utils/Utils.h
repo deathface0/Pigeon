@@ -31,7 +31,6 @@
 #include <Windows.h>
 #include <ShlObj.h>
 #include <tchar.h>
-#include <filesystem>
 
 #endif
 
@@ -44,10 +43,10 @@
 #include <iomanip>
 #include <random>
 #include <sstream>
+#include <filesystem>
 
 #include <SDL2/SDL.h>
-#include <GLEW/GL/glew.h>
-
+#include "../PigeonClient/PigeonClientGUIInfo.h"
 
 namespace File {
     static bool BufferToDisk(const std::vector<unsigned char>& buffer, const std::string& filename) {
