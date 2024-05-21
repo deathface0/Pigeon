@@ -173,10 +173,11 @@ namespace PigeonClientGUI
 				w = image ? image->width : Texture::textures[imagename]->width;
 				h = image ? image->height : Texture::textures[imagename]->height;
 
-				double maxSize = 500.0f;
-				if (w > maxSize || h > maxSize) {
-					double factorW = maxSize / (double)w;
-					double factorH = maxSize / (double)h;
+				double maxSizeW = windowWidth - 320;
+				double maxSizeH = 500.0f;
+				if (w > maxSizeW || h > maxSizeH) {
+					double factorW = maxSizeW / (double)w;
+					double factorH = maxSizeH / (double)h;
 					double aspectRatio = factorW <= factorH ? factorW : factorH;
 
 					w = (double)w * aspectRatio;
