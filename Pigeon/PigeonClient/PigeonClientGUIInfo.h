@@ -75,7 +75,8 @@ namespace PigeonClientGUIInfo
 	inline bool newMsg = false;
 	inline bool scrollDown = false;
 
-	//inline ImGuiTextBuffer msgBuffer;
+	inline std::string LastErrorMSG = "";
+
 	inline std::vector<GUI_MSG> msgBuffer;
 	inline std::string msg = "";
 

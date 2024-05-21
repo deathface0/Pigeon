@@ -83,11 +83,13 @@ namespace PigeonClientGUI
 				/*if (Address.empty() || Port.empty() || Username.empty())
 					return;*/
 
-				if (Username.size() > MAX_USERNAME)
-				{
-					//ERROR: USERNAME TOO LONG
-					return;
-				}
+				//if (Username.size() > MAX_USERNAME)
+				//{
+				//	//ERROR: USERNAME TOO LONG
+				//	LastErrorMSG = "USERNAME TOO LONG";
+				//	ImGui::OpenPopup("ERROR");
+				//	return;
+				//}
 
 				Address = "192.168.1.136";
 				Port = "4444";
@@ -98,17 +100,22 @@ namespace PigeonClientGUI
 				client->Run();
 			}
 
-			/*
-			if (ImGui::Button("Show popup"))
-				ImGui::OpenPopup("ThePopup");
+			//Spawn error popup
+			if (!LastErrorMSG.empty())
+				ImGui::OpenPopup("ERROR");
 
-			// Maybe some other stuff here.
+			ImGui::PushFont(Font::fonts["OpenSans-Variable"]->px20);
+			if (ImGui::BeginPopupModal("ERROR", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse)) {
+				if (ImGui::IsMouseClicked(0))
+				{
+					ImGui::CloseCurrentPopup();
+					LastErrorMSG.clear();
+				}
+				ImGui::Text("%s", LastErrorMSG.c_str());
 
-			if (ImGui::BeginPopupModal("ThePopup")) {
-				// Draw popup contents.
 				ImGui::EndPopup();
-			}
-			*/
+			}	
+			ImGui::PopFont();
 
 			ImGui::PopFont();
 		}

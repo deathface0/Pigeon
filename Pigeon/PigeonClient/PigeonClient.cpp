@@ -159,9 +159,32 @@ void* PigeonClient::ProcessPacket()
     }
 
     auto sHello = Handshake();
+    if (sHello.HEADER.OPCODE != SERVER_HELLO)
+    {
+        switch (sHello.HEADER.OPCODE)
+        {
+        case PROTOCOL_MISMATCH:
+        {
+            PigeonClientGUIInfo::LastErrorMSG = "PROTOCOL MISMATCH";
+            break;
+        }
+        case LENGTH_EXCEEDED:
+        {
+            PigeonClientGUIInfo::LastErrorMSG = "USERNAME TOO LONG";
+            break;
+        }
+        case USER_COLLISION:
+        {
+            PigeonClientGUIInfo::LastErrorMSG = "USERNAME ALREADY EXISTS";
+            break;
+        }
+        default:
+        {
+            PigeonClientGUIInfo::LastErrorMSG = "UNDEFINED ERROR";
+            break;
+        }
+        }
 
-    if (sHello.PAYLOAD.empty() || sHello.HEADER.OPCODE != SERVER_HELLO) {
-        //BAD PACKET Disconnect & handle GUI
         return nullptr;
     }
 
@@ -187,21 +210,9 @@ void* PigeonClient::ProcessPacket()
     while (true) {
         std::vector<unsigned char> recv = ReadPacket();
 
-        if (recv.empty()) {
-            //Disconnect & handle GUI
-            m_connected = false;
-
-            std::cout << "DISCONNECTED" << std::endl;
-
-            PigeonClientGUIInfo::msgBuffer.clear();
-            Texture::dl_textures.clear();
-
-            return nullptr;
-        }
-
         auto pkt = DeserializePacket(recv);
 
-        //std::cout << std::hex << pkt.HEADER.OPCODE << std::dec << std::endl;
+        std::cout << std::hex << pkt.HEADER.OPCODE << std::dec << std::endl;
 
         switch (pkt.HEADER.OPCODE)
         {
@@ -292,11 +303,44 @@ void* PigeonClient::ProcessPacket()
 
             PigeonClientGUIInfo::msgBuffer.push_back({ buf, MSG_TYPE::PIGEON_FILE, pkt.HEADER.TIME_STAMP, pkt.HEADER.username, filename + '.' + ext });
             break;
-        }            
+        }
+        case JSON_NOT_VALID:
+        {
+            PigeonClientGUIInfo::LastErrorMSG = "JSON NOT VALID";
+            break;
+        }
+        case USERNAME_MISMATCH:
+        {
+            PigeonClientGUIInfo::LastErrorMSG = "USERNAME MISMATCH";
+            break;
+        }
+        case RATE_LIMITED:
+        {
+            PigeonClientGUIInfo::LastErrorMSG = "RATE LIMITED";
+            break;
+        }
+        case FILE_NOT_FOUND:
+        {
+            PigeonClientGUIInfo::LastErrorMSG = "FILE NOT FOUND";
+            break;
+        }
         default:
+            m_connected = false;
             break;
         }
         value.clear();
+
+        if (recv.empty()) {
+            //Disconnect & handle GUI
+            m_connected = false;
+
+            std::cout << "DISCONNECTED" << std::endl;
+
+            PigeonClientGUIInfo::msgBuffer.clear();
+            Texture::dl_textures.clear();
+
+            return nullptr;
+        }
 
         m_connected = true; //Connected after receiving first pkg
     }
