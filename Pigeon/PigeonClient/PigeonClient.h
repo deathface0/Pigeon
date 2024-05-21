@@ -55,6 +55,8 @@ private:
 
 	std::vector<std::string> filePaths;
 
+	std::mutex mtx;
+
 	//SoundPlayer m_soundPlayer;
 
 	int Connect();

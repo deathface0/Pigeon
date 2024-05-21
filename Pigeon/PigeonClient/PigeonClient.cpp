@@ -165,21 +165,25 @@ void* PigeonClient::ProcessPacket()
         {
         case PROTOCOL_MISMATCH:
         {
+            std::lock_guard<std::mutex> lock(mtx);
             PigeonClientGUIInfo::LastErrorMSG = "PROTOCOL MISMATCH";
             break;
         }
         case LENGTH_EXCEEDED:
         {
+            std::lock_guard<std::mutex> lock(mtx);
             PigeonClientGUIInfo::LastErrorMSG = "USERNAME TOO LONG";
             break;
         }
         case USER_COLLISION:
         {
+            std::lock_guard<std::mutex> lock(mtx);
             PigeonClientGUIInfo::LastErrorMSG = "USERNAME ALREADY EXISTS";
             break;
         }
         default:
         {
+            std::lock_guard<std::mutex> lock(mtx);
             PigeonClientGUIInfo::LastErrorMSG = "UNDEFINED ERROR";
             break;
         }
@@ -296,7 +300,7 @@ void* PigeonClient::ProcessPacket()
 
             if (ext != "png" && ext != "jpg" && ext != "jpeg")
             {
-                PigeonClientGUIInfo::msgBuffer.push_back({ {}, MSG_TYPE::PIGEON_FILE, pkt.HEADER.TIME_STAMP, pkt.HEADER.username, filename + '.' + ext });
+                //PigeonClientGUIInfo::msgBuffer.push_back({ {}, MSG_TYPE::PIGEON_FILE, pkt.HEADER.TIME_STAMP, pkt.HEADER.username, filename + '.' + ext });
                 std::cout << File::BufferToDisk(buf, PigeonClientGUIInfo::donwloadPath + '/' + filename + '.' + ext) << std::endl;
                 break;
             }
@@ -306,21 +310,25 @@ void* PigeonClient::ProcessPacket()
         }
         case JSON_NOT_VALID:
         {
+            std::lock_guard<std::mutex> lock(mtx);
             PigeonClientGUIInfo::LastErrorMSG = "JSON NOT VALID";
             break;
         }
         case USERNAME_MISMATCH:
         {
+            std::lock_guard<std::mutex> lock(mtx);
             PigeonClientGUIInfo::LastErrorMSG = "USERNAME MISMATCH";
             break;
         }
         case RATE_LIMITED:
         {
+            std::lock_guard<std::mutex> lock(mtx);
             PigeonClientGUIInfo::LastErrorMSG = "RATE LIMITED";
             break;
         }
         case FILE_NOT_FOUND:
         {
+            std::lock_guard<std::mutex> lock(mtx);
             PigeonClientGUIInfo::LastErrorMSG = "FILE NOT FOUND";
             break;
         }

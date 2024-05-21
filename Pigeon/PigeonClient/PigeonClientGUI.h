@@ -38,6 +38,7 @@
 #include <thread>
 #include <future>
 #include <algorithm>
+#include <filesystem>
 
 using namespace PigeonClientGUIInfo;
 
@@ -102,6 +103,8 @@ namespace PigeonClientGUI
 			}
 
 			ImGui::PushFont(Font::fonts["OpenSans-Variable"]->px20);
+
+			//Spawn error popup
 			if (ImGui::BeginPopupModal("ERROR", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse)) {
 				if (ImGui::IsMouseClicked(0))
 				{
@@ -112,6 +115,10 @@ namespace PigeonClientGUI
 
 				ImGui::EndPopup();
 			}	
+
+			if (!LastErrorMSG.empty())
+				ImGui::OpenPopup("ERROR");
+
 			ImGui::PopFont();
 
 			ImGui::PopFont();
@@ -142,37 +149,9 @@ namespace PigeonClientGUI
 			static int numFiles = 0;
 			std::string label = "File" + std::to_string(numFiles++);
 			std::string file = filename + ext;
-
-			if (ext != ".png" && ext != ".jpg" && ext != ".jpeg")
+			
+			if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
 			{
-				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, 100), true);
-
-				ImGui::SetCursorPosX(10); ImGui::Text("%s - %s:", Time::timestampToDateTime(timestamp, "%Y-%m-%d %H:%M:%S").c_str(), username.c_str());
-				ImGui::Dummy(ImVec2(0.0f, 10.0f)); ImGui::SetCursorPosX(7); GUIUtils::Image(label, Texture::textures["file"]->texture, 40, 40);
-				ImGui::SameLine();
-
-				ImVec2 textPos = ImGui::GetCursorScreenPos();
-				ImVec2 textSize = ImGui::CalcTextSize(file.c_str());
-
-				if (ImGui::IsMouseHoveringRect(textPos, { textPos.x + textSize.x, textPos.y + +textSize.y }))
-				{
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
-					ImGui::Text("%s", file.c_str());
-					ImGui::PopStyleColor();
-
-					if (ImGui::IsMouseClicked(0))
-					{
-						std::string json = R"({"filename":")" + std::to_string(timestamp) + '_' + filename + R"("})";
-						PigeonPacket pkt = client->BuildPacket(MEDIA_DOWNLOAD, Username, std::vector<unsigned char>(json.begin(), json.end()));
-						client->SendPacket(pkt);
-					}
-				}
-				else
-				{
-					ImGui::Text("%s", file.c_str());
-				}
-			}
-			else {
 				std::string imagename = std::to_string(timestamp) + '_' + filename;
 				int w, h;
 
@@ -203,18 +182,101 @@ namespace PigeonClientGUI
 
 				ImGui::SetCurrentContext(g_ImGuiContext);
 
-
 				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, h + 50), true);
 
 				ImGui::SetCursorPosX(10); ImGui::Text("%s - %s:", Time::timestampToDateTime(timestamp, "%Y-%m-%d %H:%M:%S").c_str(), username.c_str());
 				ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
 				ImGui::SetCursorPosX(10);
-				
+
 				ImVec2 imagePos = ImGui::GetCursorScreenPos();
 				GUIUtils::Image(imagename, Texture::dl_textures[imagename]->texture, w, h);
 				if (ImGui::IsMouseHoveringRect(imagePos, ImVec2(imagePos.x + w, imagePos.y + h)) && ImGui::IsMouseReleased(1)) {
 					File::BufferToDisk(buf, PigeonClientGUIInfo::donwloadPath + '/' + filename + '.' + ext);
+				}
+			}
+			else if (ext == ".mp4" || ext == ".mkv" || ext == ".avi" || ext == ".mov" || ext == ".ogg")
+			{
+				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, 100), true);
+
+				ImGui::SetCursorPosX(10); ImGui::Text("%s - %s:", Time::timestampToDateTime(timestamp, "%Y-%m-%d %H:%M:%S").c_str(), username.c_str());
+				ImGui::Dummy(ImVec2(0.0f, 10.0f)); ImGui::SetCursorPosX(7); GUIUtils::Image(label, Texture::textures["video"]->texture, 40, 40);
+				ImGui::SameLine();
+
+				ImVec2 textPos = ImGui::GetCursorScreenPos();
+				ImVec2 textSize = ImGui::CalcTextSize(file.c_str());
+
+				if (ImGui::IsMouseHoveringRect(textPos, { textPos.x + textSize.x, textPos.y + +textSize.y }))
+				{
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
+					ImGui::Text("%s", file.c_str());
+					ImGui::PopStyleColor(2);
+
+					if (ImGui::IsMouseClicked(0))
+					{
+						std::string json = R"({"filename":")" + std::to_string(timestamp) + '_' + filename + R"("})";
+						PigeonPacket pkt = client->BuildPacket(MEDIA_DOWNLOAD, Username, std::vector<unsigned char>(json.begin(), json.end()));
+						client->SendPacket(pkt);
+					}
+				}
+				else
+				{
+					ImGui::Text("%s", file.c_str());
+				}
+
+				ImGui::SameLine(); ImGui::Dummy(ImVec2(20.0f, 0.0f)); ImGui::SameLine();
+				ImVec4 lightBlue(0.68f, 0.85f, 0.90f, 1.00f);
+				ImVec4 darkBlue(lightBlue.x * 0.7f, lightBlue.y * 0.7f, lightBlue.z * 0.7f, lightBlue.w);
+
+				std::string mediaPath = donwloadPath + '/' + filename + ext;
+				bool existFile = std::filesystem::exists(mediaPath);
+				ImVec4 color = existFile ? lightBlue : darkBlue;
+
+				ImGui::PushStyleColor(ImGuiCol_Button, color);
+				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 300);
+
+				ImVec2 imagePos = ImGui::GetCursorScreenPos();
+				GUIUtils::ImageButton("##PlayVideo", Texture::textures["play"]->texture, ImVec2(25, 30));
+				if (ImGui::IsMouseHoveringRect(imagePos, ImVec2(imagePos.x + 50, imagePos.y + 40))) {
+					if (ImGui::IsMouseReleased(0) && existFile)
+					{
+#ifdef WIN32
+						ShellExecuteA(NULL, "open", "wmplayer.exe", mediaPath.c_str(), NULL, SW_SHOWNORMAL);
+#elif __linux__
+#endif
+					}
+				}
+				ImGui::PopStyleVar();
+				ImGui::PopStyleColor();
+			}
+			else
+			{
+				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, 100), true);
+
+				ImGui::SetCursorPosX(10); ImGui::Text("%s - %s:", Time::timestampToDateTime(timestamp, "%Y-%m-%d %H:%M:%S").c_str(), username.c_str());
+				ImGui::Dummy(ImVec2(0.0f, 10.0f)); ImGui::SetCursorPosX(7); GUIUtils::Image(label, Texture::textures["file"]->texture, 40, 40);
+				ImGui::SameLine();
+
+				ImVec2 textPos = ImGui::GetCursorScreenPos();
+				ImVec2 textSize = ImGui::CalcTextSize(file.c_str());
+
+				if (ImGui::IsMouseHoveringRect(textPos, { textPos.x + textSize.x, textPos.y + +textSize.y }))
+				{
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
+					ImGui::Text("%s", file.c_str());
+					ImGui::PopStyleColor();
+
+					if (ImGui::IsMouseClicked(0))
+					{
+						std::string json = R"({"filename":")" + std::to_string(timestamp) + '_' + filename + R"("})";
+						PigeonPacket pkt = client->BuildPacket(MEDIA_DOWNLOAD, Username, std::vector<unsigned char>(json.begin(), json.end()));
+						client->SendPacket(pkt);
+					}
+				}
+				else
+				{
+					ImGui::Text("%s", file.c_str());
 				}
 			}
 
@@ -684,10 +746,6 @@ namespace PigeonClientGUI
 		SDL_GetWindowSize(sdlWindow, &windowWidth, &windowHeight);
 		ImVec2 newSize = ImVec2(windowWidth * 1.0f, windowHeight * 1.0f);
 		ImGui::SetWindowSize(newSize);
-
-		//Spawn error popup
-		if (!LastErrorMSG.empty())
-			ImGui::OpenPopup("ERROR");
 
 		//Detect page change and set styles/size
 		if (!client || !client->isConnected())
