@@ -47,6 +47,7 @@ namespace PigeonClientGUI
 
 	SDL_Window* sdlWindow = nullptr;
 	SDL_GLContext glContext = NULL;
+	ImGuiContext* g_ImGuiContext = nullptr;
 	SDL_Event currentEvent;
 
 	namespace Welcome
@@ -99,10 +100,6 @@ namespace PigeonClientGUI
 				client = new PigeonClient(Address, stoi(Port), Username);
 				client->Run();
 			}
-
-			//Spawn error popup
-			if (!LastErrorMSG.empty())
-				ImGui::OpenPopup("ERROR");
 
 			ImGui::PushFont(Font::fonts["OpenSans-Variable"]->px20);
 			if (ImGui::BeginPopupModal("ERROR", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse)) {
@@ -204,13 +201,21 @@ namespace PigeonClientGUI
 					h = (double)h * aspectRatio;
 				}
 
+				ImGui::SetCurrentContext(g_ImGuiContext);
+
+
 				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, h + 50), true);
 
 				ImGui::SetCursorPosX(10); ImGui::Text("%s - %s:", Time::timestampToDateTime(timestamp, "%Y-%m-%d %H:%M:%S").c_str(), username.c_str());
 				ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
 				ImGui::SetCursorPosX(10);
+				
+				ImVec2 imagePos = ImGui::GetCursorScreenPos();
 				GUIUtils::Image(imagename, Texture::dl_textures[imagename]->texture, w, h);
+				if (ImGui::IsMouseHoveringRect(imagePos, ImVec2(imagePos.x + w, imagePos.y + h)) && ImGui::IsMouseReleased(1)) {
+					File::BufferToDisk(buf, PigeonClientGUIInfo::donwloadPath + '/' + filename + '.' + ext);
+				}
 			}
 
 			ImGui::EndChild();
@@ -361,7 +366,7 @@ namespace PigeonClientGUI
 			ImGui::BeginChild("Chat Info", ImVec2(windowWidth - 220, 50), true);
 
 			int TextSize = 0;
-
+			
 			ImGui::SetCursorPosY(10);
 			ImGui::SetCursorPosX(infoPos);
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.525, 0.502, 0.89, 1.00f));
@@ -501,6 +506,7 @@ namespace PigeonClientGUI
 		SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
 
 		sdlWindow = SDL_CreateWindow("Pigeon Client", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, window_flags);
+		g_ImGuiContext = ImGui::CreateContext();
 
 		SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 		glContext = SDL_GL_CreateContext(sdlWindow);
@@ -672,10 +678,16 @@ namespace PigeonClientGUI
 	void MainWindow() {
 		ImGui::Begin("Pigeon Client", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
+		ImGui::SetCurrentContext(g_ImGuiContext);
+
 		//Resize Imgui window
 		SDL_GetWindowSize(sdlWindow, &windowWidth, &windowHeight);
 		ImVec2 newSize = ImVec2(windowWidth * 1.0f, windowHeight * 1.0f);
 		ImGui::SetWindowSize(newSize);
+
+		//Spawn error popup
+		if (!LastErrorMSG.empty())
+			ImGui::OpenPopup("ERROR");
 
 		//Detect page change and set styles/size
 		if (!client || !client->isConnected())
