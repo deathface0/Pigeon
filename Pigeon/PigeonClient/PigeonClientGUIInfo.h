@@ -72,6 +72,8 @@ namespace PigeonClientGUIInfo
 	inline int showMenu = false;
 	inline bool selecting = true;
 	inline bool focusMSG = false;
+	inline bool newMsg = false;
+	inline bool scrollDown = false;
 
 	//inline ImGuiTextBuffer msgBuffer;
 	inline std::vector<GUI_MSG> msgBuffer;

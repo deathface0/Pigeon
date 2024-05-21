@@ -201,7 +201,7 @@ void* PigeonClient::ProcessPacket()
 
         auto pkt = DeserializePacket(recv);
 
-        std::cout << std::hex << pkt.HEADER.OPCODE << std::dec << std::endl;
+        //std::cout << std::hex << pkt.HEADER.OPCODE << std::dec << std::endl;
 
         switch (pkt.HEADER.OPCODE)
         {
@@ -226,18 +226,17 @@ void* PigeonClient::ProcessPacket()
 
             break;
         case TEXT_MESSAGE:
-            //send message to GUI...
+            PigeonClientGUIInfo::newMsg = true;
+            
             cmsg = std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end());
-            //PigeonClientGUIInfo::msgBuffer.appendf("%s\n", cmsg.c_str());
             PigeonClientGUIInfo::msgBuffer.push_back({ {}, MSG_TYPE::PIGEON_TEXT, pkt.HEADER.TIME_STAMP , pkt.HEADER.username, cmsg });
 
             //std::thread([&]() {m_soundPlayer.play(PigeonClientGUIInfo::msgAudioPath); }).detach();
-
-            std::cout << pkt.HEADER.username << ": " << std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end()) << std::endl;
             break;
 
         case MEDIA_FILE:
         {
+            PigeonClientGUIInfo::newMsg = true;
 
             if (!reader.parse(std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end()), value)) {
                 //bad json, again, this wont really happen
@@ -256,8 +255,6 @@ void* PigeonClient::ProcessPacket()
                 std::string json = R"({"filename":")" + std::to_string(pkt.HEADER.TIME_STAMP) + '_' + filename + R"("})";
                 PigeonPacket downPacket = BuildPacket(MEDIA_DOWNLOAD, m_username, std::vector<unsigned char>(json.begin(), json.end()));
                 SendPacket(downPacket);
-
-                std::cout << "USER: " << pkt.HEADER.username << std::endl;
 
                 break;
             }
@@ -284,7 +281,7 @@ void* PigeonClient::ProcessPacket()
 
             auto buf = String::StringToBytes(B64::base64_decode(content));
 
-            std::cout << "USER: " << pkt.HEADER.username << std::endl;
+            //std::cout << "USER: " << pkt.HEADER.username << std::endl;
 
             if (ext != "png" && ext != "jpg" && ext != "jpeg")
             {

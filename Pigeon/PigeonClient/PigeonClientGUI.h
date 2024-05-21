@@ -380,7 +380,15 @@ namespace PigeonClientGUI
 			ImGui::BeginChild("Chat Log", ImVec2(windowWidth - 220, windowHeight - 100), true);
 
 			printMsgBuffer();
-			ImGui::SetScrollHereY(1.0f); //Always stay on the bottom side of the chat
+
+			if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY() && newMsg)
+				scrollDown = true;
+
+			if (scrollDown && ImGui::GetScrollY() < ImGui::GetScrollMaxY())
+			{
+				scrollDown = false;
+				ImGui::SetScrollHereY(1.0f);
+			}
 
 			ImGui::EndChild(); //End of Chat Log Child
 
@@ -438,6 +446,8 @@ namespace PigeonClientGUI
 			RightMenu();
 
 			ImGui::PopStyleColor(3);
+
+			newMsg = false;
 		}
 	}
 
