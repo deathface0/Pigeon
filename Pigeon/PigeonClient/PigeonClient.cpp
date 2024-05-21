@@ -194,7 +194,7 @@ void* PigeonClient::ProcessPacket()
             std::cout << "DISCONNECTED" << std::endl;
 
             PigeonClientGUIInfo::msgBuffer.clear();
-            Texture::textures.clear();
+            Texture::dl_textures.clear();
 
             return nullptr;
         }
@@ -254,8 +254,10 @@ void* PigeonClient::ProcessPacket()
             if (ext == "png" || ext == "jpg" || ext == "jpeg")
             {
                 std::string json = R"({"filename":")" + std::to_string(pkt.HEADER.TIME_STAMP) + '_' + filename + R"("})";
-                PigeonPacket downPacket = BuildPacket(MEDIA_DOWNLOAD, pkt.HEADER.username, std::vector<unsigned char>(json.begin(), json.end()));
+                PigeonPacket downPacket = BuildPacket(MEDIA_DOWNLOAD, m_username, std::vector<unsigned char>(json.begin(), json.end()));
                 SendPacket(downPacket);
+
+                std::cout << "USER: " << pkt.HEADER.username << std::endl;
 
                 break;
             }
@@ -281,6 +283,8 @@ void* PigeonClient::ProcessPacket()
                 break;
 
             auto buf = String::StringToBytes(B64::base64_decode(content));
+
+            std::cout << "USER: " << pkt.HEADER.username << std::endl;
 
             if (ext != "png" && ext != "jpg" && ext != "jpeg")
             {

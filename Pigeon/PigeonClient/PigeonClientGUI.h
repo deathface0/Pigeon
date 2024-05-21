@@ -174,17 +174,17 @@ namespace PigeonClientGUI
 
 				//Generate texture if not exist
 				Texture::Image* image = nullptr;
-				if (Texture::textures.find(imagename) == Texture::textures.end()) 
+				if (Texture::dl_textures.find(imagename) == Texture::dl_textures.end())
 				{
 					image = new Texture::Image;
 					if (!GUIUtils::generateTexture(buf, image))
 						return false;
 
-					Texture::textures.insert({ imagename, image });
+					Texture::dl_textures.insert({ imagename, image });
 				}
 
-				w = image ? image->width : Texture::textures[imagename]->width;
-				h = image ? image->height : Texture::textures[imagename]->height;
+				w = image ? image->width : Texture::dl_textures[imagename]->width;
+				h = image ? image->height : Texture::dl_textures[imagename]->height;
 
 				double maxSizeW = windowWidth - 320;
 				double maxSizeH = 500.0f;
@@ -203,7 +203,7 @@ namespace PigeonClientGUI
 				ImGui::Dummy(ImVec2(0.0f, 10.0f));
 
 				ImGui::SetCursorPosX(10);
-				GUIUtils::Image(imagename, Texture::textures[imagename]->texture, w, h);
+				GUIUtils::Image(imagename, Texture::dl_textures[imagename]->texture, w, h);
 			}
 
 			ImGui::EndChild();
@@ -419,7 +419,7 @@ namespace PigeonClientGUI
 				client->SendPacket(pkg);
 
 				msgBuffer.clear();
-				Texture::textures.clear();
+				Texture::dl_textures.clear();
 			}
 
 			ImGui::PopFont();

@@ -92,6 +92,7 @@ namespace Texture {
 	};
 
 	inline std::unordered_map<std::string, Image*> textures;
+	inline std::unordered_map<std::string, Image*> dl_textures;
 }
 
 namespace Font {
