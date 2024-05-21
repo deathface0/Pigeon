@@ -190,6 +190,12 @@ void* PigeonClient::ProcessPacket()
         if (recv.empty()) {
             //Disconnect & handle GUI
             m_connected = false;
+
+            std::cout << "DISCONNECTED" << std::endl;
+
+            PigeonClientGUIInfo::msgBuffer.clear();
+            Texture::textures.clear();
+
             return nullptr;
         }
 

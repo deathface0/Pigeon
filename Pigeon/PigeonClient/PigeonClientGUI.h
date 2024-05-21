@@ -97,6 +97,19 @@ namespace PigeonClientGUI
 				client = new PigeonClient(Address, stoi(Port), Username);
 				client->Run();
 			}
+
+			/*
+			if (ImGui::Button("Show popup"))
+				ImGui::OpenPopup("ThePopup");
+
+			// Maybe some other stuff here.
+
+			if (ImGui::BeginPopupModal("ThePopup")) {
+				// Draw popup contents.
+				ImGui::EndPopup();
+			}
+			*/
+
 			ImGui::PopFont();
 		}
 	}
