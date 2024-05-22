@@ -3,7 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
-Pigeon/main.cpp
 Pigeon/ext/lib/avcodec.lib
 Dependencies
 # User-specific files

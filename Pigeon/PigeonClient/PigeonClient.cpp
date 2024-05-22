@@ -248,7 +248,6 @@ void* PigeonClient::ProcessPacket()
             cmsg = std::string(pkt.PAYLOAD.begin(), pkt.PAYLOAD.end());
             PigeonClientGUIInfo::msgBuffer.push_back({ {}, MSG_TYPE::PIGEON_TEXT, pkt.HEADER.TIME_STAMP , pkt.HEADER.username, cmsg });
 
-            //std::thread([&]() {m_soundPlayer.play(PigeonClientGUIInfo::msgAudioPath); }).detach();
             break;
 
         case MEDIA_FILE:

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\MediaPlayer">
-      <UniqueIdentifier>{8872a125-c563-417c-abde-28f2a58502f6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\PigeonClient">
       <UniqueIdentifier>{12c80d5a-4547-4f63-81f9-d30069eb697a}</UniqueIdentifier>
     </Filter>
@@ -25,17 +22,8 @@
     <Filter Include="Header Files\imgui">
       <UniqueIdentifier>{0267820a-5a5a-4f7c-a84b-dcf943aad709}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\SoundPlayer">
-      <UniqueIdentifier>{8e2bae5a-36c6-4b26-afce-662f964875a4}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MediaPlayer\MediaPlayer.cpp">
-      <Filter>Header Files\MediaPlayer</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PigeonClient\PigeonClient.cpp">
       <Filter>Header Files\PigeonClient</Filter>
     </ClCompile>
@@ -72,14 +60,11 @@
     <ClCompile Include="..\Dependencies\include\imgui\imgui_stdlib.cpp">
       <Filter>Header Files\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="SoundPlayer\SoundPlayer.cpp">
-      <Filter>Header Files\SoundPlayer</Filter>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MediaPlayer\MediaPlayer.h">
-      <Filter>Header Files\MediaPlayer</Filter>
-    </ClInclude>
     <ClInclude Include="PigeonClient\PigeonClient.h">
       <Filter>Header Files\PigeonClient</Filter>
     </ClInclude>
@@ -130,9 +115,6 @@
     </ClInclude>
     <ClInclude Include="PigeonClient\PigeonClientGUIInfo.h">
       <Filter>Header Files\PigeonClient</Filter>
-    </ClInclude>
-    <ClInclude Include="SoundPlayer\SoundPlayer.h">
-      <Filter>Header Files\SoundPlayer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
