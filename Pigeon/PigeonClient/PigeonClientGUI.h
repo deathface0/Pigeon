@@ -298,7 +298,11 @@ namespace PigeonClientGUI
 				switch (msg.type) {
 				case MSG_TYPE::PIGEON_TEXT:
 					ImGui::SetCursorPosX(10);
-					ImGui::Text("%s - %s: %s", Time::timestampToDateTime(msg.timestamp, "%Y-%m-%d %H:%M:%S").c_str(), msg.username.c_str(), msg.content.c_str());
+					ImGui::Text("%s - %s: ", Time::timestampToDateTime(msg.timestamp, "%Y-%m-%d %H:%M:%S").c_str(), msg.username.c_str());
+					ImGui::SetCursorPosX(10);
+					ImGui::PushTextWrapPos(windowWidth - 220);
+					ImGui::TextWrapped("%s", msg.content.c_str());
+					ImGui::PopTextWrapPos();
 					ImGui::Separator();
 					break;
 				case MSG_TYPE::PIGEON_FILE:
