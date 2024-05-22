@@ -330,41 +330,33 @@ namespace GUIUtils
         int channels;
         stbi_uc* img = stbi_load_from_memory(buffer.data(), buffer.size(), &image->width, &image->height, &channels, 0);
 
-        if (img) {
-            // Image loaded successfully
-            glGenTextures(1, &image->texture);
-            glBindTexture(GL_TEXTURE_2D, image->texture);
+        if (!img)
+            return false;
 
-            // Determine the format based on the number of channels
-            GLenum format;
-            if (channels == 1)
-                format = GL_RED;
-            else if (channels == 3)
-                format = GL_RGB;
-            else if (channels == 4)
-                format = GL_RGBA;
-            else {
-                std::cout << "Unsupported number of channels: " << channels << std::endl;
-                stbi_image_free(img);  // Corrected to free the right pointer
-                return true;
-            }
+        // Image loaded successfully
+        glGenTextures(1, &image->texture);
+        glBindTexture(GL_TEXTURE_2D, image->texture);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, format, image->width, image->height, 0, format, GL_UNSIGNED_BYTE, img);  // Corrected height parameter
-
-            // Set texture parameters
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            // Free the image data after usage
-            stbi_image_free(img);
-        }
+        // Determine the format based on the number of channels
+        GLenum format;
+        if (channels == 1)
+            format = GL_RED;
+        else if (channels == 3)
+            format = GL_RGB;
+        else if (channels == 4)
+            format = GL_RGBA;
         else {
-            std::cout << "FAILED TO LOAD IMAGE FROM BUFFER: " << stbi_failure_reason() << std::endl;
-
+            std::cout << "Unsupported number of channels: " << channels << std::endl;
+            stbi_image_free(img);  // Corrected to free the right pointer
             return false;
         }
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, image->width, image->height, 0, format, GL_UNSIGNED_BYTE, img);
+        
+        // Free the image data after usage
+        stbi_image_free(img);
+        return true;
     }
 
 

@@ -497,7 +497,7 @@ namespace PigeonClientGUI
 			}
 			ImGui::SameLine();
 			if (GUIUtils::ImageButton("Disconnect", Texture::textures["exit"]->texture, ImVec2((float)47, (float)47), ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f), 1, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), ImVec4(1.0f, 1.0f, 1.0f, 1.0f))) {
-				PigeonPacket pkg = client->BuildPacket(PIGEON_OPCODE::PRESENCE_UPDATE, Username, String::StringToBytes("DISCONNECT"));
+				PigeonPacket pkg;
 				client->SendPacket(pkg);
 
 				msgBuffer.clear();

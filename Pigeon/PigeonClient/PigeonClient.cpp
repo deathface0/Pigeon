@@ -161,6 +161,8 @@ void* PigeonClient::ProcessPacket()
     auto sHello = Handshake();
     if (sHello.HEADER.OPCODE != SERVER_HELLO)
     {
+
+        std::cout << std::hex << sHello.HEADER.OPCODE << std::dec << std::endl;
         switch (sHello.HEADER.OPCODE)
         {
         case PROTOCOL_MISMATCH:
