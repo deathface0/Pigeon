@@ -186,7 +186,7 @@ void* PigeonClient::ProcessPacket()
         default:
         {
             std::lock_guard<std::mutex> lock(mtx);
-            PigeonClientGUIInfo::LastErrorMSG = "UNDEFINED ERROR";
+            PigeonClientGUIInfo::LastErrorMSG = "BAD CLIENT HELLO";
             break;
         }
         }

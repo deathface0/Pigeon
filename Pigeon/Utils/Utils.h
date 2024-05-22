@@ -304,25 +304,19 @@ namespace GUIUtils
     {
         int channels;
         stbi_uc* img = stbi_load(imagePath.c_str(), &image->width, &image->height, &channels, 4);
-        assert(img != NULL);
 
-        if (img)
-        {
-            // Turn the RGBA pixel data into an OpenGL texture:
-            glGenTextures(1, &image->texture);
-            glBindTexture(GL_TEXTURE_2D, image->texture);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
-
-            stbi_image_free(img);
-
-            return true;
-        }
-        else 
-        {
+        if(!img)
             return false;
-        }
-        
+
+        // Turn the RGBA pixel data into an OpenGL texture:
+        glGenTextures(1, &image->texture);
+        glBindTexture(GL_TEXTURE_2D, image->texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->width, image->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
+
+        stbi_image_free(img);
+
+        return true;        
     }
 
     inline bool generateTexture(const std::vector<unsigned char>& buffer, Texture::Image* image)

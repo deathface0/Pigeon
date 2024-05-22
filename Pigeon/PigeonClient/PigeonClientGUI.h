@@ -14,7 +14,7 @@
 #include "../imgui/imgui_stdlib.h"
 
 #include <GL/glew.h>
-
+#include <cstdlib>
 
 //MSVC
 #else
@@ -195,7 +195,8 @@ namespace PigeonClientGUI
 					File::BufferToDisk(buf, PigeonClientGUIInfo::donwloadPath + '/' + filename + '.' + ext);
 				}
 			}
-			else if (ext == ".mp4" || ext == ".mkv" || ext == ".avi" || ext == ".mov" || ext == ".ogg")
+			else if (ext == ".mp4" || ext == ".mkv" || ext == ".avi" || ext == ".mov" || ext == ".ogg" ||
+					 ext == ".mp3" || ext == ".aac" || ext == ".wma" || ext == ".aiff")
 			{
 				ImGui::BeginChild(label.c_str(), ImVec2(windowWidth - 220, 100), true);
 
@@ -244,6 +245,8 @@ namespace PigeonClientGUI
 #ifdef WIN32
 						ShellExecuteA(NULL, "open", "wmplayer.exe", mediaPath.c_str(), NULL, SW_SHOWNORMAL);
 #elif __linux__
+						std::string command = "vlc --play-and-exit \"" + mediaPath + "\" &";
+    					std::system(command.c_str());
 #endif
 					}
 				}
