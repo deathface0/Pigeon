@@ -82,21 +82,8 @@ namespace PigeonClientGUI
 
 			if (GUIUtils::ButtonCentered("Connect", 200, 50) || ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter)))
 			{
-				/*if (Address.empty() || Port.empty() || Username.empty())
-					return;*/
-
-				//if (Username.size() > MAX_USERNAME)
-				//{
-				//	//ERROR: USERNAME TOO LONG
-				//	LastErrorMSG = "USERNAME TOO LONG";
-				//	ImGui::OpenPopup("ERROR");
-				//	return;
-				//}
-
-				Address = "192.168.1.136";
-				Port = "4444";
-
-				/*Username = "Ahuesag";*/
+				if (Address.empty() || Port.empty() || Username.empty())
+					return;
 
 				client = new PigeonClient(Address, stoi(Port), Username);
 				client->Run();
@@ -129,6 +116,7 @@ namespace PigeonClientGUI
 	{
 		inline std::future<void> s_filepathFuture;
 
+		//Get user status texture
 		GLuint& getStatusImage(int status)
 		{
 			switch (status)
@@ -144,6 +132,20 @@ namespace PigeonClientGUI
 			}
 		}
 
+		//Return resized image metrics
+		void getResizedMetrics(double maxWidth, double maxHeight, int& width, int& height)
+		{
+			if (width > maxWidth || width > maxHeight) {
+				double factorW = maxWidth / (double)width;
+				double factorH = maxHeight / (double)height;
+				double aspectRatio = factorW <= factorH ? factorW : factorH;
+
+				width = (double)width * aspectRatio;
+				height = (double)height * aspectRatio;
+			}
+		}
+
+		//Render file msg depending on extension
 		bool renderFileUpload(std::vector<unsigned char> buf, time_t timestamp, std::string username, std::string filename, std::string ext)
 		{
 			static int numFiles = 0;
@@ -169,16 +171,10 @@ namespace PigeonClientGUI
 				w = image ? image->width : Texture::dl_textures[imagename]->width;
 				h = image ? image->height : Texture::dl_textures[imagename]->height;
 
+				//Resize image
 				double maxSizeW = windowWidth - 320;
 				double maxSizeH = 500.0f;
-				if (w > maxSizeW || h > maxSizeH) {
-					double factorW = maxSizeW / (double)w;
-					double factorH = maxSizeH / (double)h;
-					double aspectRatio = factorW <= factorH ? factorW : factorH;
-
-					w = (double)w * aspectRatio;
-					h = (double)h * aspectRatio;
-				}
+				getResizedMetrics(maxSizeW, maxSizeH, w, h);
 
 				ImGui::SetCurrentContext(g_ImGuiContext);
 
@@ -191,7 +187,7 @@ namespace PigeonClientGUI
 
 				ImVec2 imagePos = ImGui::GetCursorScreenPos();
 				GUIUtils::Image(imagename, Texture::dl_textures[imagename]->texture, w, h);
-				if (ImGui::IsMouseHoveringRect(imagePos, ImVec2(imagePos.x + w, imagePos.y + h)) && ImGui::IsMouseReleased(1)) {
+				if (ImGui::IsMouseHoveringRect(imagePos, ImVec2(imagePos.x + w, imagePos.y + h)) && ImGui::IsMouseReleased(1)) { //Donwload image if right clicked
 					File::BufferToDisk(buf, PigeonClientGUIInfo::donwloadPath + '/' + filename + '.' + ext);
 				}
 			}
@@ -207,6 +203,7 @@ namespace PigeonClientGUI
 				ImVec2 textPos = ImGui::GetCursorScreenPos();
 				ImVec2 textSize = ImGui::CalcTextSize(file.c_str());
 
+				//Detect interaction with filename
 				if (ImGui::IsMouseHoveringRect(textPos, { textPos.x + textSize.x, textPos.y + +textSize.y }))
 				{
 					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
@@ -230,6 +227,7 @@ namespace PigeonClientGUI
 				ImVec4 lightBlue(0.68f, 0.85f, 0.90f, 1.00f);
 				ImVec4 darkBlue(lightBlue.x * 0.7f, lightBlue.y * 0.7f, lightBlue.z * 0.7f, lightBlue.w);
 
+				//Check if media exists
 				std::string mediaPath = donwloadPath + '/' + filename + ext;
 				bool existFile = std::filesystem::exists(mediaPath);
 				ImVec4 color = existFile ? lightBlue : darkBlue;
@@ -237,6 +235,7 @@ namespace PigeonClientGUI
 				ImGui::PushStyleColor(ImGuiCol_Button, color);
 				ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 300);
 
+				//Play video
 				ImVec2 imagePos = ImGui::GetCursorScreenPos();
 				GUIUtils::ImageButton("##PlayVideo", Texture::textures["play"]->texture, ImVec2(25, 30));
 				if (ImGui::IsMouseHoveringRect(imagePos, ImVec2(imagePos.x + 50, imagePos.y + 40))) {
@@ -264,6 +263,7 @@ namespace PigeonClientGUI
 				ImVec2 textPos = ImGui::GetCursorScreenPos();
 				ImVec2 textSize = ImGui::CalcTextSize(file.c_str());
 
+				//Download file when pressed
 				if (ImGui::IsMouseHoveringRect(textPos, { textPos.x + textSize.x, textPos.y + +textSize.y }))
 				{
 					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.212, 0.722, 1.00, 1.00f));
@@ -288,6 +288,7 @@ namespace PigeonClientGUI
 			return true;
 		}
 
+		//Print each message in buffer
 		void printMsgBuffer()
 		{	
 			int count = 0;
@@ -335,6 +336,7 @@ namespace PigeonClientGUI
 		{
 			std::string filepath = File::selectFile();
 
+			//Divide file name and file extension
 			size_t lastSlashPos = filepath.find_last_of('/');
 			std::string filenameWithExt = filepath.substr(lastSlashPos + 1);
 
@@ -343,6 +345,7 @@ namespace PigeonClientGUI
 			std::string extension = (lastDotPos != std::string::npos) ? filenameWithExt.substr(lastDotPos + 1) : "";
 			extension.erase(std::remove(extension.begin(), extension.end(), '\0'), extension.end());
 
+			//if file selected upload
 			if (!filepath.empty())
 			{
 				std::string encoded_file = B64::base64_encode(String::BytesToString(File::DiskToBuffer(filepath)));
@@ -363,7 +366,7 @@ namespace PigeonClientGUI
 			ImGui::BeginChild("Connected clients", ImVec2(220, windowHeight - 50), true);
 
 			int clientIndex = 0; ImVec2 clientStatusPos = { 10, 10 };
-			for (const auto& pair : Users) {
+			for (const auto& pair : Users) { //Show every user in left menu
 				ImGui::SetCursorPos(clientStatusPos);
 				if (GUIUtils::RoundButton(pair.first, getStatusImage(stoi(pair.second)), 30)) //Fix, utils no reload images
 				{
@@ -383,10 +386,9 @@ namespace PigeonClientGUI
 
 			try { currentStatus = stoi(Users[Username]); } catch (std::exception& e) {}
 			ImGui::SetCursorPos(ImVec2(10, 10));
-			if (GUIUtils::RoundButton("##your_status", getStatusImage(currentStatus), 30))
-			{
+			if (GUIUtils::RoundButton("##your_status", getStatusImage(currentStatus), 30)) //Click to show status menu
 				showMenu = true;
-			}
+
 			ImGui::SameLine();
 			ImGui::SetCursorPos(ImVec2(45, 10));
 			ImGui::Text("%s", Username.c_str());
@@ -401,7 +403,7 @@ namespace PigeonClientGUI
 
 				selecting = false;
 				ImGui::SetNextItemWidth(220);
-				if (ImGui::BeginCombo("##A", status_vec[currentStatus])) {
+				if (ImGui::BeginCombo("##A", status_vec[currentStatus])) { //Select status menu
 					selecting = true;
 
 					for (int i = 0; i < IM_ARRAYSIZE(status_vec); i++) {
@@ -412,7 +414,7 @@ namespace PigeonClientGUI
 							showMenu = false;
 						}
 						if (isSelected)
-							ImGui::SetItemDefaultFocus();   // Establecer el enfoque en la opci�n seleccionada
+							ImGui::SetItemDefaultFocus();   // Set focus
 					}
 					ImGui::EndCombo();
 				}
@@ -436,6 +438,7 @@ namespace PigeonClientGUI
 
 			int TextSize = 0;
 			
+			//Server msg
 			ImGui::SetCursorPosY(10);
 			ImGui::SetCursorPosX(infoPos);
 			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.525, 0.502, 0.89, 1.00f));
@@ -456,7 +459,7 @@ namespace PigeonClientGUI
 
 			ImGui::GetStyle().Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
 
-			ImGui::EndChild();
+			ImGui::EndChild(); //End of Chat Log Info Child
 
 			ImGui::BeginChild("Chat Log", ImVec2(windowWidth - 220, windowHeight - 100), true);
 
@@ -483,6 +486,7 @@ namespace PigeonClientGUI
 
 			ImGui::PushFont(Font::fonts["OpenSans-Variable"]->px40);
 
+			//MSG inputbox
 			ImGui::PushItemWidth(windowWidth - 370);
 			ImGui::InputText("##MSG", &msg);
 			if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Enter))) {
@@ -526,7 +530,7 @@ namespace PigeonClientGUI
 			ImGui::SameLine();
 			RightMenu();
 
-			ImGui::PopStyleColor(3);
+			ImGui::PopStyleColor(3); //Pop pushed colors
 
 			newMsg = false;
 		}
@@ -551,7 +555,7 @@ namespace PigeonClientGUI
 			ImGui::PushItemWidth(600);
 			ImGui::InputText("##DownloadPath", &donwloadPath);
 			ImGui::SameLine();
-			if (GUIUtils::ImageButton("##SelectDownloadPath", Texture::textures["folder"]->texture, ImVec2(30, 30)))
+			if (GUIUtils::ImageButton("##SelectDownloadPath", Texture::textures["folder"]->texture, ImVec2(30, 30))) //Select download path button
 			{
 				std::thread([&]()
 				{
@@ -615,7 +619,6 @@ namespace PigeonClientGUI
 		colors[ImGuiCol_CheckMark] = ImVec4(0.33f, 0.67f, 0.86f, 1.00f);
 		colors[ImGuiCol_SliderGrab] = ImVec4(0.34f, 0.34f, 0.34f, 0.54f);
 		colors[ImGuiCol_SliderGrabActive] = ImVec4(0.56f, 0.56f, 0.56f, 0.54f);
-		//colors[ImGuiCol_Button] = ImVec4(0.05f, 0.05f, 0.05f, 0.54f);
 		colors[ImGuiCol_Button] = ImVec4(0.796f, 0.592f, 0.357f, 1.00f);
 		colors[ImGuiCol_ButtonHovered] = ImVec4(0.19f, 0.19f, 0.19f, 0.54f);
 		colors[ImGuiCol_ButtonActive] = ImVec4(0.20f, 0.22f, 0.23f, 1.00f);

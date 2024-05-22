@@ -267,6 +267,7 @@ void* PigeonClient::ProcessPacket()
                 break;
             }
 
+            //If file is an image download it
             if (ext == "png" || ext == "jpg" || ext == "jpeg")
             {
                 std::string json = R"({"filename":")" + std::to_string(pkt.HEADER.TIME_STAMP) + '_' + filename + R"("})";
@@ -278,7 +279,7 @@ void* PigeonClient::ProcessPacket()
 
             PigeonClientGUIInfo::msgBuffer.push_back({{}, MSG_TYPE::PIGEON_FILE, pkt.HEADER.TIME_STAMP, pkt.HEADER.username, filename + '.' + ext});
 
-            std::cout << "New media file by: " << pkt.HEADER.username << " Filename: " << filename << std::endl;
+            //std::cout << "New media file by: " << pkt.HEADER.username << " Filename: " << filename << std::endl;
             filePaths.push_back(filename);
             break;
         }
@@ -298,11 +299,9 @@ void* PigeonClient::ProcessPacket()
 
             auto buf = String::StringToBytes(B64::base64_decode(content));
 
-            //std::cout << "USER: " << pkt.HEADER.username << std::endl;
-
+            //If file is not image save into disk
             if (ext != "png" && ext != "jpg" && ext != "jpeg")
             {
-                //PigeonClientGUIInfo::msgBuffer.push_back({ {}, MSG_TYPE::PIGEON_FILE, pkt.HEADER.TIME_STAMP, pkt.HEADER.username, filename + '.' + ext });
                 std::cout << File::BufferToDisk(buf, PigeonClientGUIInfo::donwloadPath + '/' + filename + '.' + ext) << std::endl;
                 break;
             }
