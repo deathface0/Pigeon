@@ -1,44 +1,57 @@
-#include <SDL2/SDL.h>
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_sdlrenderer2.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-int main(int argc, char** argv) {
-    // Inicializar SDL
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        printf("Error: %s\n", SDL_GetError());
-        return -1;
+#include "PigeonClient/PigeonClientGUI.h"
+
+template <typename K, typename V>
+std::pair<K, V> removeLastElement(std::unordered_map<K, V>& m) {
+    if (m.empty()) {
+        throw std::out_of_range("Cannot remove element from an empty unordered_map");
     }
 
-    // Crear una ventana con SDL
-    SDL_Window* window = SDL_CreateWindow("SDL Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    auto lastIter = m.end();
+    --lastIter; // Move to the last element (arbitrarily chosen)
 
-    if (!window) {
-        printf("Error: %s\n", SDL_GetError());
-        SDL_Quit();
-        return -1;
+    std::pair<K, V> lastElement = *lastIter; // Copy the last element
+    m.erase(lastIter); // Erase the last element
+
+    return lastElement; // Return the copied element
+}
+
+int main(int argc, char** argv)
+{
+    if (PigeonClientGUI::CreateImGuiWindow() != 0)
+    {
+        std::cerr << "Error to create SDL window " << std::endl;
     }
 
-    // Bucle principal
-    bool quit = false;
-    while (!quit) {
-        // Manejar eventos de SDL
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                quit = true;
+    PigeonClientGUI::SetUpImGui();
+
+    GUIUtils::textureLoader("Images/");
+    GUIUtils::fontLoader("Fonts/");
+
+    PigeonClientGUIInfo::donwloadPath = File::getHomeDirectory();
+
+    while (!shouldClose)
+    {
+        while (SDL_PollEvent(&PigeonClientGUI::currentEvent))
+        {
+            ImGui_ImplSDL2_ProcessEvent(&PigeonClientGUI::currentEvent);
+            if (PigeonClientGUI::currentEvent.type == SDL_QUIT)
+            {
+                shouldClose = true;
             }
         }
+        PigeonClientGUI::StartImGuiFrame();
 
-        // Aquí puedes agregar lógica para la renderización y gestión de la interfaz de usuario con SDL
+        PigeonClientGUI::MainWindow();
 
-        // Intercambiar el búfer de la ventana
-        SDL_GL_SwapWindow(window);
+        PigeonClientGUI::Render();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
-    // Liberar recursos
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
+    PigeonClientGUI::Cleanup();
     return 0;
 }

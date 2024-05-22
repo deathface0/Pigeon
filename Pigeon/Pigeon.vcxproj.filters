@@ -13,10 +13,108 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\PigeonClient">
+      <UniqueIdentifier>{12c80d5a-4547-4f63-81f9-d30069eb697a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{c7749020-774d-4ee8-a24a-a527aa408055}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\imgui">
+      <UniqueIdentifier>{0267820a-5a5a-4f7c-a84b-dcf943aad709}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="PigeonClient\PigeonClient.cpp">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClCompile>
+    <ClCompile Include="PigeonClient\WindowsTcpClient.cpp">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClCompile>
+    <ClCompile Include="PigeonClient\TcpClient.cpp">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_widgets.cpp">
+      <Filter>Header Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_tables.cpp">
+      <Filter>Header Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_impl_sdl2.cpp">
+      <Filter>Header Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_impl_opengl3.cpp">
+      <Filter>Header Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_draw.cpp">
+      <Filter>Header Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_demo.cpp">
+      <Filter>Header Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dependencies\include\imgui\imgui.cpp">
+      <Filter>Header Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_stdlib.cpp">
+      <Filter>Header Files\imgui</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PigeonClient\PigeonClient.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\WindowsTcpClient.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\TcpClient.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\PigeonPacket.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Utils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\include\imgui\imstb_rectpack.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\include\imgui\imstb_truetype.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\include\imgui\imstb_textedit.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\include\imgui\imgui_internal.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\include\imgui\imgui_impl_sdl2.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\include\imgui\imgui_impl_opengl3.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiLogger.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\include\imgui\imgui.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\include\stb_image\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dependencies\include\imgui\imgui_stdlib.h">
+      <Filter>Header Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\PigeonClientGUI.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
+    <ClInclude Include="PigeonClient\PigeonClientGUIInfo.h">
+      <Filter>Header Files\PigeonClient</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

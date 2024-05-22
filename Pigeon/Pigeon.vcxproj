@@ -71,69 +71,126 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)ext\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)ext\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Dependencies\include\SDL2;$(SolutionDir)Dependencies\include\imgui;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Dependencies\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\include;$(SolutionDir)Dependencies\include\FFmpeg</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\lib\FFmpeg;$(SolutionDir)Dependencies\lib\GLEW;$(SolutionDir)Dependencies\lib\imgui;$(SolutionDir)Dependencies\lib\SDL2\x64;$(SolutionDir)Dependencies\lib\openssl</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);imgui.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;swscale.lib;opengl32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer.lib;glew32.lib;libcrypto.lib;libssl.lib;jsoncpp.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\include;$(SolutionDir)Dependencies\include\FFmpeg</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\lib\FFmpeg;$(SolutionDir)Dependencies\lib\GLEW;$(SolutionDir)Dependencies\lib\imgui;$(SolutionDir)Dependencies\lib\SDL2\x64;$(SolutionDir)Dependencies\lib\openssl</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);imgui.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;swscale.lib;opengl32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer.lib;glew32.lib;libcrypto.lib;libssl.lib;jsoncpp.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\include;$(SolutionDir)Dependencies\include\FFmpeg</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\lib\FFmpeg;$(SolutionDir)Dependencies\lib\GLEW;$(SolutionDir)Dependencies\lib\imgui;$(SolutionDir)Dependencies\lib\SDL2\x64;$(SolutionDir)Dependencies\lib\openssl</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);imgui.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;swscale.lib;opengl32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer.lib;glew32.lib;libcrypto.lib;libssl.lib;jsoncpp.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\include;$(ProjectDir)Utils</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)ext\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;imgui.lib;SDL2.lib;SDL2main.lib;swresample.lib;swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\lib\FFmpeg;$(SolutionDir)Dependencies\lib\GLEW;$(SolutionDir)Dependencies\lib\SDL2\x64;$(SolutionDir)Dependencies\lib\openssl;$(SolutionDir)Dependencies\lib\imgui</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);opengl32.lib;SDL2.lib;SDL2main.lib;SDL2_mixer.lib;glew32.lib;libcrypto.lib;libssl.lib;jsoncpp.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Dependencies\include\imgui\imgui.cpp" />
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_impl_sdl2.cpp" />
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_stdlib.cpp" />
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\Dependencies\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PigeonClient\PigeonClient.cpp" />
+    <ClCompile Include="PigeonClient\TcpClient.cpp" />
+    <ClCompile Include="PigeonClient\WindowsTcpClient.cpp" />
+    <ClCompile Include="stb_image.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Dependencies\include\imgui\imgui.h" />
+    <ClInclude Include="..\Dependencies\include\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\Dependencies\include\imgui\imgui_impl_sdl2.h" />
+    <ClInclude Include="..\Dependencies\include\imgui\imgui_internal.h" />
+    <ClInclude Include="..\Dependencies\include\imgui\imgui_stdlib.h" />
+    <ClInclude Include="..\Dependencies\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\Dependencies\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\Dependencies\include\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\Dependencies\include\stb_image\stb_image.h" />
+    <ClInclude Include="ImGuiLogger.h" />
+    <ClInclude Include="PigeonClient\PigeonClient.h" />
+    <ClInclude Include="PigeonClient\PigeonClientGUI.h" />
+    <ClInclude Include="PigeonClient\PigeonClientGUIInfo.h" />
+    <ClInclude Include="PigeonClient\PigeonPacket.h" />
+    <ClInclude Include="PigeonClient\TcpClient.h" />
+    <ClInclude Include="PigeonClient\WindowsTcpClient.h" />
+    <ClInclude Include="Utils\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
