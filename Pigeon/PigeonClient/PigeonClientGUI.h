@@ -377,7 +377,7 @@ namespace PigeonClientGUI
 
 			ImGui::BeginChild("User Status", ImVec2(220, 50), true);
 
-			currentStatus = stoi(Users[Username]); //Users[Username] always exists (own username)
+			try { currentStatus = stoi(Users[Username]); } catch (std::exception& e) {}
 			ImGui::SetCursorPos(ImVec2(10, 10));
 			if (GUIUtils::RoundButton("##your_status", getStatusImage(currentStatus), 30))
 			{
