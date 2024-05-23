@@ -3,8 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
-Pigeon/ext/lib/avcodec.lib
-Dependencies
 # User-specific files
 *.rsuser
 *.suo
